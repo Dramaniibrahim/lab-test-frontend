@@ -60,7 +60,7 @@ export default function Sidebar() {
 
                 <div className="flex items-center space-x-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
                   <Users className="w-4 h-4" />
-                  <span>Results</span>
+                  {<li><Link to="/results">Results</Link></li>}
                 </div>
 
                 <div className="flex items-center space-x-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
@@ -70,12 +70,12 @@ export default function Sidebar() {
 
                 <div className="flex items-center space-x-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
                   <Users className="w-4 h-4" />
-                  <span>Test Request</span>
+                  {<li><Link to="/samples">Samples</Link></li>}
                 </div>
 
                 <div className="flex items-center space-x-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
                   <div className="w-4 h-4 bg-gray-400 rounded"></div>
-                  {<li><Link to="/reports">Reports</Link></li>}
+                  {<li><Link to="/test-requests">Test Request</Link></li>}
                 </div>
               </div>
             </div>
