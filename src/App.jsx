@@ -23,6 +23,7 @@ import ResultEdit from './pages/results/[id]';
 import Reports from './pages/reports/index';
 import useAuthContext from './hooks/useAuth';
 import SchedulePage from './pages/schedules';
+import Register from './pages/auth/Register';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register/>} />
             <Route path="/" element={<ProtectedRoute />}>
               <Route index element={<DashboardRouter />} />
               <Route path="patients" element={<PatientsList />} />

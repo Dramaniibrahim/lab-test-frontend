@@ -1,27 +1,41 @@
 import { useState } from 'react';
-import { useAuth } from '../../context/AuthContext'; // Fixed import
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Eye, Check } from 'lucide-react';
+import { Mail, User, Lock, Check } from 'lucide-react';
 
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { login, error, loading } = useAuth();
+export default function Register() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'DOCTOR',
+  });
+  const [localError, setLocalError] = useState(null); // Local error state for immediate feedback
+  const { register, error: authError, loading } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setLocalError(null); // Clear previous errors
     try {
-      await login(email, password);
-      navigate('/patients'); // Redirect to patients page after login
+      // Basic password validation (per API: min 8 chars, uppercase, lowercase, number, special char)
+      if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(formData.password)) {
+        throw new Error('Password must be at least 8 characters, with uppercase, lowercase, number, and special character.');
+      }
+      console.log('Submitting registration:', formData); // Debug log
+      await register(formData.name, formData.email, formData.password, formData.role);
+      console.log('Registration successful, navigating to /patients'); // Debug log
+      navigate('/patients');
     } catch (err) {
-      // Error is handled in AuthContext and available via error state
+      const errorMessage = err.message || 'Registration failed. Please try again.';
+      setLocalError(errorMessage);
+      console.error('Registration error:', err); // Debug log
     }
   };
 
   return (
     <div className="bg-white w-full h-screen grid grid-cols-1 lg:grid-cols-2">
-      {/* Left Panel - Login Form */}
+      {/* Left Panel - Register Form */}
       <div className="p-12 flex flex-col justify-center">
         {/* Logo */}
         <div className="flex items-center mb-12">
@@ -33,15 +47,40 @@ export default function Login() {
 
         {/* Welcome Text */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-          <p className="text-gray-500">Please enter your details</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+          <p className="text-gray-500">Please enter your details to register</p>
         </div>
 
         {/* Error Message */}
-        {error && <div className="mb-4 text-red-600">{error}</div>}
+        {(authError || localError) && (
+          <div className="mb-4 text-red-600">{authError || localError}</div>
+        )}
 
         {/* Form */}
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleRegister}>
+          {/* Name Input */}
+          <div className="mb-3">
+            <label className="block text-sm text-gray-600 mb-2">Name</label>
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <User size={20} />
+              </div>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter your full name"
+                required
+              />
+              {formData.name && (
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-500">
+                  <Check size={20} />
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Email Input */}
           <div className="mb-3">
             <label className="block text-sm text-gray-600 mb-2">Email</label>
@@ -51,13 +90,13 @@ export default function Login() {
               </div>
               <input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter your email"
                 required
               />
-              {email && (
+              {formData.email && (
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-500">
                   <Check size={20} />
                 </div>
@@ -66,21 +105,21 @@ export default function Login() {
           </div>
 
           {/* Password Input */}
-          <div className="mb-6">
+          <div className="mb-3">
             <label className="block text-sm text-gray-600 mb-2">Password</label>
             <div className="relative">
               <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                <Eye size={20} />
+                <Lock size={20} />
               </div>
               <input
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter your password"
                 required
               />
-              {password && (
+              {formData.password && (
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-500">
                   <Check size={20} />
                 </div>
@@ -88,28 +127,44 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Continue Button */}
+          {/* Role Input */}
+          <div className="mb-6">
+            <label className="block text-sm text-gray-600 mb-2">Role</label>
+            <select
+              value={formData.role}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              className="w-full py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            >
+              <option value="DOCTOR">Doctor</option>
+              <option value="NURSE">Nurse</option>
+              <option value="LAB_STAFF">Lab Staff</option>
+              <option value="SENIOR_LAB_STAFF">Senior Lab Staff</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+
+          {/* Register Button */}
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-blue-600 text-white py-4 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-6 disabled:bg-blue-300"
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
 
-        {/* Link to Register */}
+        {/* Link to Login */}
         <p className="text-center text-gray-500">
-          Don't have an account?{' '}
-          <a href="/register" className="text-blue-600 hover:underline">
-            Register
+          Already have an account?{' '}
+          <a href="/login" className="text-blue-600 hover:underline">
+            Login
           </a>
         </p>
       </div>
 
       {/* Right Panel - 3D Illustration */}
       <div className="bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 flex items-center justify-center p-12 relative overflow-hidden">
-        {/* Same as your original illustration code */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-4 h-4 bg-white rounded-full"></div>
           <div className="absolute top-20 right-16 w-2 h-2 bg-white rounded-full"></div>
