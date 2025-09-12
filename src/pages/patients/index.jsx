@@ -7,9 +7,15 @@ export default function PatientsList() {
   const [selectedView, setSelectedView] = useState("Today");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // Safe defaults in case hook is undefined during first render
-  const { patients = [], fetchData = () => {} } = usePatientsData() || {};
-  console.log("PatientsList hook data:", { patients, fetchData });
+  // Normalize patients into an array, even if API returns an object
+  const { patients: rawPatients = [], fetchData = () => {} } = usePatientsData() || {};
+  const patients = Array.isArray(rawPatients)
+    ? rawPatients
+    : rawPatients?.data && Array.isArray(rawPatients.data)
+    ? rawPatients.data
+    : [];
+
+  console.log("PatientsList normalized data:", patients);
 
   const handleFormSubmit = (formData) => {
     console.log("Patient form submitted:", formData);
