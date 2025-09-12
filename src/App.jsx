@@ -61,7 +61,9 @@ function DashboardRouter() {
   const auth = useAuth();
   console.log("DashboardRouter context:", auth);
 
-  if (!auth?.user) return null;
+  if (!auth?.user)  
+    return <div className="p-6">Loading dashboard...</div>
+  ;
 
   switch (auth.user.role?.toLowerCase()) {
     case 'admin': return <AdminDashboard />;
