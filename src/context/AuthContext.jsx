@@ -1,4 +1,4 @@
-import { createContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useState, useCallback, useEffect, useContext } from 'react';
 import axios from '../services/api/axios';
 import { LOGIN_URL, REGISTER_URL, LOGOUT_URL, VERIFY_TOKEN_URL } from '../services/api/routes';
 
