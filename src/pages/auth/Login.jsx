@@ -1,21 +1,27 @@
 import { useState } from 'react';
-import { useAuth } from '../../context/AuthContext'; // Fixed import
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Eye, Check } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, error, loading } = useAuth();
+  const [localError, setLocalError] = useState(null); // Local error state for immediate feedback
+  const { login, error: authError, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLocalError(null); // Clear previous errors
     try {
+      console.log('Submitting login:', { email, password }); // Debug log
       await login(email, password);
-      navigate('/patients'); // Redirect to patients page after login
+      console.log('Login successful, navigating to /patients'); // Debug log
+      navigate('/patients');
     } catch (err) {
-      // Error is handled in AuthContext and available via error state
+      const errorMessage = err.message || 'Login failed. Please try again.';
+      setLocalError(errorMessage);
+      console.error('Login error:', err); // Debug log
     }
   };
 
@@ -38,7 +44,9 @@ export default function Login() {
         </div>
 
         {/* Error Message */}
-        {error && <div className="mb-4 text-red-600">{error}</div>}
+        {(authError || localError) && (
+          <div className="mb-4 text-red-600">{authError || localError}</div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleLogin}>
@@ -109,7 +117,6 @@ export default function Login() {
 
       {/* Right Panel - 3D Illustration */}
       <div className="bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 flex items-center justify-center p-12 relative overflow-hidden">
-        {/* Same as your original illustration code */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-4 h-4 bg-white rounded-full"></div>
           <div className="absolute top-20 right-16 w-2 h-2 bg-white rounded-full"></div>
