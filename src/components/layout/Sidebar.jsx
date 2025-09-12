@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useAuthContext from '../../hooks/useAuth';
 import { canAccessPatients, canCreateTestRequests, canProcessSamples, canEnterResults, canValidateResults, canViewReports } from '../../utils/roles';
 import { 
@@ -19,8 +19,19 @@ import {
   Trash2,
   MoreHorizontal
 } from 'lucide-react';
+
 export default function Sidebar() {
   const { user, logout } = useAuthContext();
+  const navigate = useNavigate();
+  
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login', { replace: true });
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
 
   if (!user) return null;
 
@@ -93,7 +104,7 @@ export default function Sidebar() {
                   <span>Widgets</span> 
                 </div> */}
                 <div className="flex items-center space-x-3 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
-                  onClick={logout}
+                  onClick={handleLogout}
                 >
                   <div className="w-4 h-4 bg-red-400 rounded"></div>
                   <span>Log Out</span>

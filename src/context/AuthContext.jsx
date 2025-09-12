@@ -27,14 +27,19 @@ export const AuthProvider = ({ children }) => {
       });
       console.log('Login API response:', response.data);
 
-      // Handle different API response structures
+      // Handle API response with nested tokens
+      const { data } = response;
       let accessToken, refreshToken, user;
-      if (response.data.data) {
-        ({ accessToken, refreshToken, user } = response.data.data);
-      } else if (response.data.token) {
-        ({ token: accessToken, refreshToken, user } = response.data);
+      if (data.data && data.data.tokens) {
+        // Structure: { success: true, data: { tokens: { accessToken, refreshToken }, user } }
+        ({ accessToken, refreshToken } = data.data.tokens);
+        ({ user } = data.data);
+      } else if (data.tokens) {
+        // Structure: { success: true, tokens: { accessToken, refreshToken }, user }
+        ({ accessToken, refreshToken } = data.tokens);
+        ({ user } = data);
       } else {
-        ({ accessToken, refreshToken, user } = response.data);
+        throw new Error('Invalid API response structure');
       }
 
       if (!accessToken || !user) {
@@ -75,13 +80,17 @@ export const AuthProvider = ({ children }) => {
       });
       console.log('Register API response:', response.data);
 
+      // Handle API response with nested tokens
+      const { data } = response;
       let accessToken, refreshToken, user;
-      if (response.data.data) {
-        ({ accessToken, refreshToken, user } = response.data.data);
-      } else if (response.data.token) {
-        ({ token: accessToken, refreshToken, user } = response.data);
+      if (data.data && data.data.tokens) {
+        ({ accessToken, refreshToken } = data.data.tokens);
+        ({ user } = data.data);
+      } else if (data.tokens) {
+        ({ accessToken, refreshToken } = data.tokens);
+        ({ user } = data);
       } else {
-        ({ accessToken, refreshToken, user } = response.data);
+        throw new Error('Invalid API response structure');
       }
 
       if (!accessToken || !user) {

@@ -27,7 +27,6 @@ export default function Login() {
       console.log('Submitting login:', { email, password });
       await login(email, password);
       console.log('Login successful, current auth state:', auth);
-      console.log('Attempting navigation to /patients');
       toast.success('Login successful!');
     } catch (err) {
       const errorMessage = err.message || 'Login failed. Please try again.';
