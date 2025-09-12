@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import AdminDashboard from './pages/dashboard/AdminDashboard';
 import DoctorDashboard from './pages/dashboard/DoctorDashboard';
