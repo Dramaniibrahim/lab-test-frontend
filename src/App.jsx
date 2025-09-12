@@ -61,11 +61,11 @@ function DashboardRouter() {
   const auth = useAuth();
   console.log("DashboardRouter context:", auth);
 
-  if (!auth.auth?.user)  
+  if (!auth?.user)  
     return <div className="p-6">Loading dashboard...</div>
   ;
 
-  switch (auth.auth.user.role?.toLowerCase()) {
+  switch (auth.user.role?.toLowerCase()) {
     case 'admin': return <AdminDashboard />;
     case 'doctor': return <AdminDashboard />;
     case 'nurse': return <AdminDashboard />;
