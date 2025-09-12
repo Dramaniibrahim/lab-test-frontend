@@ -118,7 +118,7 @@ export const CreateTestRequest = ({ onClose, onSubmit }) => {
     notes: "",
   });
   const [loading, setLoading] = useState(false);
-  const { auth } = useContext(AuthContext);
+  const { auth } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -190,7 +190,7 @@ export const CreateSample = ({ onClose, onSubmit }) => {
     collectedBy: "",
   });
   const [loading, setLoading] = useState(false);
-  const { auth } = useContext(AuthContext);
+  const { auth } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -265,7 +265,7 @@ export const CreateLabResult = ({ onClose, onSubmit }) => {
     remarks: "",
   });
   const [loading, setLoading] = useState(false);
-  const { auth } = useContext(AuthContext);
+  const { auth } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
