@@ -7,7 +7,9 @@ export default function PatientsList() {
   const [selectedView, setSelectedView] = useState("Today");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const { patients, fetchData } = usePatientsData();
+  // Safe defaults in case hook is undefined during first render
+  const { patients = [], fetchData = () => {} } = usePatientsData() || {};
+  console.log("PatientsList hook data:", { patients, fetchData });
 
   const handleFormSubmit = (formData) => {
     console.log("Patient form submitted:", formData);
@@ -16,7 +18,7 @@ export default function PatientsList() {
   };
 
   const getAvatar = (gender) => {
-    if (!gender) return "👤"; // fallback
+    if (!gender) return "👤";
     return gender.toLowerCase() === "female" ? "👩" : "👨";
   };
 
@@ -25,9 +27,7 @@ export default function PatientsList() {
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Patient Overview
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900">Patient Overview</h3>
           <div className="flex items-center space-x-4">
             {/* Period filter buttons */}
             <div className="flex space-x-2">
@@ -68,63 +68,37 @@ export default function PatientsList() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <input type="checkbox" className="rounded border-gray-300" />
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Age
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date of Birth
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Email
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Phone
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Action
-              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date of Birth</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {patients && patients.length > 0 ? (
+            {patients.length > 0 ? (
               patients.map((patient) => (
-                <tr key={patient.id} className="hover:bg-gray-50">
+                <tr key={patient.id || patient.email} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input type="checkbox" className="rounded border-gray-300" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {patient.id}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-4">
                         <span>{getAvatar(patient.gender)}</span>
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {patient.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {patient.room || "—"}
-                        </div>
+                        <div className="text-sm font-medium text-gray-900">{patient.name}</div>
+                        <div className="text-sm text-gray-500">{patient.room || "—"}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {patient.age}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {patient.dob}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.age}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.dob}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -136,12 +110,8 @@ export default function PatientsList() {
                       ● {patient.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {patient.email}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {patient.phone}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.email}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.phone}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex space-x-2">
                       <button className="text-blue-600 hover:text-blue-900">
@@ -156,10 +126,7 @@ export default function PatientsList() {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan={9}
-                  className="px-6 py-4 text-center text-sm text-gray-500"
-                >
+                <td colSpan={9} className="px-6 py-4 text-center text-sm text-gray-500">
                   No patients found.
                 </td>
               </tr>
