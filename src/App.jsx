@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthContext, AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import Login from './pages/auth/Login';
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -23,6 +23,7 @@ import ResultEdit from './pages/results/[id]';
 import Reports from './pages/reports/index';
 import SchedulePage from './pages/schedules';
 import Register from './pages/auth/Register';
+import { useContext } from 'react';
 
 function App() {
   return (
@@ -57,9 +58,9 @@ function App() {
 }
 
 function DashboardRouter() {
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
   console.log('DashboardRouter: user:', user);
-  //if (!user) return null;
+  if (!user) return null;
 
   // Normalize role to uppercase
   const role = user.role?.toUpperCase();
