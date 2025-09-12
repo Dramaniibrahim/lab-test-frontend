@@ -65,10 +65,10 @@ function DashboardRouter() {
 
   switch (auth.user.role?.toLowerCase()) {
     case 'admin': return <AdminDashboard />;
-    case 'doctor': return <DoctorDashboard />;
-    case 'nurse': return <NurseDashboard />;
-    case 'labstaff': return <LabStaffDashboard />;
-    case 'seniorlabstaff': return <SeniorLabStaffDashboard />;
+    case 'doctor': return <AdminDashboard />;
+    case 'nurse': return <AdminDashboard />;
+    case 'labstaff': return <AdminDashboard/>;
+    case 'seniorlabstaff': return <AdminDashboard />;
     default: return <div>Invalid role: {auth.user.role}</div>;
   }
 }
