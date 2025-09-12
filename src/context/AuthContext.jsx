@@ -1,9 +1,9 @@
 import { createContext, useState, useCallback, useEffect } from 'react';
 import axios from '../services/api/axios';
 import { LOGIN_URL, REGISTER_URL, LOGOUT_URL, VERIFY_TOKEN_URL } from '../services/api/routes';
-import { useNavigate } from 'react-router-dom';
 
 export const AuthContext = createContext();
+
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
@@ -15,7 +15,6 @@ export const AuthProvider = ({ children }) => {
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const login = useCallback(async (email, password) => {
     setLoading(true);
@@ -28,25 +27,29 @@ export const AuthProvider = ({ children }) => {
       });
       console.log('Login API response:', response.data);
 
-      // Adjust based on actual API response structure
+      // Handle different API response structures
       let accessToken, refreshToken, user;
       if (response.data.data) {
-        // Structure: { success: true, message: string, data: { accessToken, refreshToken, user } }
         ({ accessToken, refreshToken, user } = response.data.data);
+      } else if (response.data.token) {
+        ({ token: accessToken, refreshToken, user } = response.data);
       } else {
-        // Structure: { success: true, accessToken, refreshToken, user }
         ({ accessToken, refreshToken, user } = response.data);
       }
 
+      if (!accessToken || !user) {
+        throw new Error('Invalid API response: missing accessToken or user');
+      }
+
       localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-      localStorage.setItem('role', user.role);
+      localStorage.setItem('refreshToken', refreshToken || '');
+      localStorage.setItem('role', user.role || '');
 
       const newAuthState = {
         user,
         token: accessToken,
-        refreshToken,
-        role: user.role,
+        refreshToken: refreshToken || null,
+        role: user.role || null,
       };
       setAuth(newAuthState);
       console.log('Updated auth state:', newAuthState);
@@ -75,19 +78,25 @@ export const AuthProvider = ({ children }) => {
       let accessToken, refreshToken, user;
       if (response.data.data) {
         ({ accessToken, refreshToken, user } = response.data.data);
+      } else if (response.data.token) {
+        ({ token: accessToken, refreshToken, user } = response.data);
       } else {
         ({ accessToken, refreshToken, user } = response.data);
       }
 
+      if (!accessToken || !user) {
+        throw new Error('Invalid API response: missing accessToken or user');
+      }
+
       localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-      localStorage.setItem('role', user.role);
+      localStorage.setItem('refreshToken', refreshToken || '');
+      localStorage.setItem('role', user.role || '');
 
       const newAuthState = {
         user,
         token: accessToken,
-        refreshToken,
-        role: user.role,
+        refreshToken: refreshToken || null,
+        role: user.role || null,
       };
       setAuth(newAuthState);
       console.log('Updated auth state:', newAuthState);
@@ -119,7 +128,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('role');
       setAuth({ user: null, token: null, refreshToken: null, role: null });
-      navigate('/login');
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Logout failed';
       console.error('Logout API error:', err.response || err);
@@ -128,7 +136,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [auth.token, navigate]);
+  }, [auth.token]);
 
   const verifyToken = useCallback(async () => {
     try {
