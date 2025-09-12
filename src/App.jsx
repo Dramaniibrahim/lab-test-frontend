@@ -59,7 +59,7 @@ function App() {
 function DashboardRouter() {
   const { user } = useAuth();
   console.log('DashboardRouter: user:', user);
-  if (!user) return null;
+  //if (!user) return null;
 
   // Normalize role to uppercase
   const role = user.role?.toUpperCase();
