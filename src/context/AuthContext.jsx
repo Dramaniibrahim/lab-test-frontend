@@ -1,6 +1,6 @@
 import { createContext, useState, useCallback, useEffect } from 'react';
 import axios from '../api/axios';
-import { LOGIN_URL, REGISTER_URL, LOGOUT_URL, VERIFY_TOKEN_URL } from '../api/routes';
+import { LOGIN_URL, REGISTER_URL, LOGOUT_URL, VERIFY_TOKEN_URL } from '../services/api/routes';
 import { useNavigate } from 'react-router-dom';
 
 export const AuthContext = createContext();
