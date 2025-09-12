@@ -1,8 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import AdminDashboard from './pages/dashboard/AdminDashboard';
 import DoctorDashboard from './pages/dashboard/DoctorDashboard';
@@ -23,6 +22,8 @@ import ResultCreate from './pages/results/create';
 import ResultEdit from './pages/results/[id]';
 import Reports from './pages/reports/index';
 import useAuthContext from './hooks/useAuth';
+import SchedulePage from './pages/schedules';
+import Register from './pages/auth/Register';
 
 function App() {
   return (
@@ -57,7 +58,7 @@ function App() {
 }
 
 function DashboardRouter() {
-  const { user } = useAuthContext();
+  const { user } = useAuth();
   console.log('DashboardRouter: user:', user);
   if (!user) return null;
 
