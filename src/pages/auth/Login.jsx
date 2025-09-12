@@ -14,8 +14,8 @@ export default function Login() {
 
   useEffect(() => {
     console.log('Auth state updated:', auth);
-    if (auth.token && auth.user) {
-      console.log('Auth present, navigating to');
+    if (auth.token && auth.user && auth.user.id) {
+      console.log('Auth present, navigating to /');
       navigate('/', { replace: true });
     }
   }, [auth, navigate]);

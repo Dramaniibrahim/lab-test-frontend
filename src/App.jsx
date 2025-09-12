@@ -21,7 +21,6 @@ import ResultsList from './pages/results/index';
 import ResultCreate from './pages/results/create';
 import ResultEdit from './pages/results/[id]';
 import Reports from './pages/reports/index';
-import useAuthContext from './hooks/useAuth';
 import SchedulePage from './pages/schedules';
 import Register from './pages/auth/Register';
 
