@@ -37,7 +37,7 @@ export const CreatePatient = ({ onClose, onSubmit }) => {
     contact: "",
   });
   const [loading, setLoading] = useState(false);
-  const { auth } = useAuth;
+  const { auth } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
