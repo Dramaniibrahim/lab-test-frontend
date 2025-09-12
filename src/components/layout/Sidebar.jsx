@@ -21,7 +21,8 @@ import {
 } from 'lucide-react';
 
 export default function Sidebar() {
-  const { user, logout } = useAuthContext();
+  const { auth, logout } = useAuthContext();
+  const { user } = auth;
   console.log("Sidebar context:", user);
   const navigate = useNavigate();
   
