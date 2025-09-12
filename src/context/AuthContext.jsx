@@ -1,43 +1,58 @@
-import { createContext, useState, useContext, useCallback, useEffect } from 'react';
-import axios from '../services/api/axios';
-import { LOGIN_URL, REGISTER_URL, REFRESH_TOKEN_URL, LOGOUT_URL, LOGOUT_ALL_URL, VERIFY_TOKEN_URL } from '../services/api/routes';
+import { createContext, useState, useCallback, useEffect } from 'react';
+import axios from '../api/axios';
+import { LOGIN_URL, REGISTER_URL, LOGOUT_URL, VERIFY_TOKEN_URL } from '../api/routes';
+import { useNavigate } from 'react-router-dom';
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     user: null,
-    token: localStorage.getItem('accessToken') || null,
-    refreshToken: localStorage.getItem('refreshToken') || null,
-    role: localStorage.getItem('role') || null,
+    token: null,
+    refreshToken: null,
+    role: null,
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const login = useCallback(async (email, password) => {
     setLoading(true);
     setError(null);
     try {
+      console.log('Calling API:', LOGIN_URL, { email, password });
       const response = await axios.post(LOGIN_URL, { email, password }, {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
-      const { data } = response.data;
-      const { accessToken, refreshToken, user } = data;
+      console.log('Login API response:', response.data);
+
+      // Adjust based on actual API response structure
+      let accessToken, refreshToken, user;
+      if (response.data.data) {
+        // Structure: { success: true, message: string, data: { accessToken, refreshToken, user } }
+        ({ accessToken, refreshToken, user } = response.data.data);
+      } else {
+        // Structure: { success: true, accessToken, refreshToken, user }
+        ({ accessToken, refreshToken, user } = response.data);
+      }
 
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('role', user.role);
 
-      setAuth({
+      const newAuthState = {
         user,
         token: accessToken,
         refreshToken,
         role: user.role,
-      });
+      };
+      setAuth(newAuthState);
+      console.log('Updated auth state:', newAuthState);
       return user;
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Login failed';
+      console.error('Login API error:', err.response || err);
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -49,26 +64,36 @@ export function AuthProvider({ children }) {
     setLoading(true);
     setError(null);
     try {
+      console.log('Calling API:', REGISTER_URL, { name, email, password, role });
       const response = await axios.post(REGISTER_URL, { name, email, password, role }, {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
-      const { data } = response.data;
-      const { accessToken, refreshToken, user } = data;
+      console.log('Register API response:', response.data);
+
+      let accessToken, refreshToken, user;
+      if (response.data.data) {
+        ({ accessToken, refreshToken, user } = response.data.data);
+      } else {
+        ({ accessToken, refreshToken, user } = response.data);
+      }
 
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('role', user.role);
 
-      setAuth({
+      const newAuthState = {
         user,
         token: accessToken,
         refreshToken,
         role: user.role,
-      });
+      };
+      setAuth(newAuthState);
+      console.log('Updated auth state:', newAuthState);
       return user;
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Registration failed';
+      console.error('Register API error:', err.response || err);
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -78,103 +103,67 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
+      console.log('Calling API:', LOGOUT_URL);
       await axios.post(LOGOUT_URL, {}, {
-        headers: { Authorization: `Bearer ${auth.token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${auth.token}`,
+        },
         withCredentials: true,
       });
-    } catch (err) {
-      console.error('Logout error:', err);
-    } finally {
+      console.log('Logout successful');
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('role');
       setAuth({ user: null, token: null, refreshToken: null, role: null });
-      setLoading(false);
-    }
-  }, [auth.token]);
-
-  const logoutAll = useCallback(async () => {
-    setLoading(true);
-    try {
-      await axios.post(LOGOUT_ALL_URL, {}, {
-        headers: { Authorization: `Bearer ${auth.token}` },
-        withCredentials: true,
-      });
+      navigate('/login');
     } catch (err) {
-      console.error('Logout all error:', err);
+      const errorMessage = err.response?.data?.message || 'Logout failed';
+      console.error('Logout API error:', err.response || err);
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('role');
-      setAuth({ user: null, token: null, refreshToken: null, role: null });
       setLoading(false);
     }
-  }, [auth.token]);
+  }, [auth.token, navigate]);
 
   const verifyToken = useCallback(async () => {
     try {
-      const response = await axios.post(VERIFY_TOKEN_URL, {}, {
-        headers: { Authorization: `Bearer ${auth.token}` },
+      console.log('Calling API:', VERIFY_TOKEN_URL);
+      const response = await axios.get(VERIFY_TOKEN_URL, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
         withCredentials: true,
       });
-      return response.data.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Token verification failed');
-      throw err;
-    }
-  }, [auth.token]);
-
-  const refreshToken = useCallback(async () => {
-    try {
-      const response = await axios.post(REFRESH_TOKEN_URL, {}, {
-        headers: { Authorization: `Bearer ${auth.refreshToken}` },
-        withCredentials: true,
-      });
-      const { data } = response.data;
-      const { accessToken, refreshToken: newRefreshToken } = data;
-
-      localStorage.setItem('accessToken', accessToken);
-      if (newRefreshToken) localStorage.setItem('refreshToken', newRefreshToken);
-
+      console.log('Verify token response:', response.data);
+      const { user } = response.data.data || response.data;
       setAuth((prev) => ({
         ...prev,
-        token: accessToken,
-        refreshToken: newRefreshToken || prev.refreshToken,
+        user,
+        token: localStorage.getItem('accessToken'),
+        refreshToken: localStorage.getItem('refreshToken'),
+        role: user.role,
       }));
-      return accessToken;
     } catch (err) {
-      logout();
-      throw new Error('Session expired. Please log in again.');
+      console.error('Verify token error:', err.response || err);
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('role');
+      setAuth({ user: null, token: null, refreshToken: null, role: null });
     }
-  }, [auth.refreshToken, logout]);
+  }, []);
 
   useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true;
-          try {
-            const newAccessToken = await refreshToken();
-            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-            return axios(originalRequest);
-          } catch (refreshError) {
-            return Promise.reject(refreshError);
-          }
-        }
-        return Promise.reject(error);
-      }
-    );
-    return () => axios.interceptors.response.eject(interceptor);
-  }, [refreshToken]);
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      verifyToken();
+    }
+  }, [verifyToken]);
 
   return (
-    <AuthContext.Provider value={{ auth, login, register, logout, logoutAll, verifyToken, loading, error }}>
+    <AuthContext.Provider value={{ auth, login, register, logout, verifyToken, error, loading, setError, setLoading }}>
       {children}
     </AuthContext.Provider>
   );
-}
-
-export const useAuth = () => useContext(AuthContext);
+};

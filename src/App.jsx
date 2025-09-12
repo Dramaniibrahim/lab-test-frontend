@@ -22,8 +22,6 @@ import ResultCreate from './pages/results/create';
 import ResultEdit from './pages/results/[id]';
 import Reports from './pages/reports/index';
 import useAuthContext from './hooks/useAuth';
-import SchedulePage from './pages/schedules';
-import Register from './pages/auth/Register';
 
 function App() {
   return (
@@ -32,7 +30,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register/>} />
+            <Route path="/register" element={<Register />} />
             <Route path="/" element={<ProtectedRoute />}>
               <Route index element={<DashboardRouter />} />
               <Route path="patients" element={<PatientsList />} />
@@ -59,14 +57,21 @@ function App() {
 
 function DashboardRouter() {
   const { user } = useAuthContext();
+  console.log('DashboardRouter: user:', user);
   if (!user) return null;
-  switch (user.role) {
-    case 'Admin': return <AdminDashboard />;
-    case 'Doctor': return <AdminDashboard />;
-    case 'Nurse': return <AdminDashboard />;
-    case 'LabStaff': return <AdminDashboard />;
-    case 'SeniorLabStaff': return <AdminDashboard />;
-    default: return <div>Invalid role</div>;
+
+  // Normalize role to uppercase
+  const role = user.role?.toUpperCase();
+  console.log('DashboardRouter: normalized role:', role);
+  switch (role) {
+    case 'ADMIN': return <AdminDashboard />;
+    case 'DOCTOR': return <AdminDashboard />;
+    case 'NURSE': return <AdminDashboard />;
+    case 'LAB_STAFF': return <AdminDashboard />;
+    case 'SENIOR_LAB_STAFF': return <AdminDashboard />;
+    default:
+      console.log('Invalid role:', role);
+      return <div>Invalid role</div>;
   }
 }
 

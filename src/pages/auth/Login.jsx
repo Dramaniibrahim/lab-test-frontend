@@ -1,56 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Eye, Check } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [localError, setLocalError] = useState(null); // Local error state for immediate feedback
-  const { login, error: authError, loading } = useAuth();
+  const [localError, setLocalError] = useState(null);
+  const { login, error: authError, loading, auth } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log('Auth state updated:', auth);
+    if (auth.token && auth.user) {
+      console.log('Auth present, navigating to /patients');
+      navigate('/patients', { replace: true });
+    }
+  }, [auth, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLocalError(null); // Clear previous errors
+    setLocalError(null);
     try {
-      console.log('Submitting login:', { email, password }); // Debug log
+      console.log('Submitting login:', { email, password });
       await login(email, password);
-      console.log('Login successful, navigating to /patients'); // Debug log
-      navigate('/patients');
+      console.log('Login successful, current auth state:', auth);
+      console.log('Attempting navigation to /patients');
+      toast.success('Login successful!');
     } catch (err) {
       const errorMessage = err.message || 'Login failed. Please try again.';
       setLocalError(errorMessage);
-      console.error('Login error:', err); // Debug log
+      toast.error(errorMessage);
+      console.error('Login error:', err);
     }
   };
 
   return (
     <div className="bg-white w-full h-screen grid grid-cols-1 lg:grid-cols-2">
-      {/* Left Panel - Login Form */}
       <div className="p-12 flex flex-col justify-center">
-        {/* Logo */}
         <div className="flex items-center mb-12">
           <div className="w-8 h-8 bg-black rounded-sm flex items-center justify-center mr-3 transform -skew-x-12">
             <div className="w-3 h-3 bg-white rounded-sm transform skew-x-12"></div>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">LIMS</h1>
         </div>
-
-        {/* Welcome Text */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
           <p className="text-gray-500">Please enter your details</p>
         </div>
-
-        {/* Error Message */}
         {(authError || localError) && (
           <div className="mb-4 text-red-600">{authError || localError}</div>
         )}
-
-        {/* Form */}
         <form onSubmit={handleLogin}>
-          {/* Email Input */}
           <div className="mb-3">
             <label className="block text-sm text-gray-600 mb-2">Email</label>
             <div className="relative">
@@ -72,8 +75,6 @@ export default function Login() {
               )}
             </div>
           </div>
-
-          {/* Password Input */}
           <div className="mb-6">
             <label className="block text-sm text-gray-600 mb-2">Password</label>
             <div className="relative">
@@ -95,8 +96,6 @@ export default function Login() {
               )}
             </div>
           </div>
-
-          {/* Continue Button */}
           <button
             type="submit"
             disabled={loading}
@@ -105,17 +104,14 @@ export default function Login() {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-
-        {/* Link to Register */}
         <p className="text-center text-gray-500">
           Don't have an account?{' '}
           <a href="/register" className="text-blue-600 hover:underline">
             Register
           </a>
         </p>
+        <ToastContainer />
       </div>
-
-      {/* Right Panel - 3D Illustration */}
       <div className="bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 flex items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-4 h-4 bg-white rounded-full"></div>
