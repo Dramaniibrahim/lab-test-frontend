@@ -62,10 +62,10 @@ function DashboardRouter() {
   if (!user) return null;
   switch (user.role) {
     case 'Admin': return <AdminDashboard />;
-    case 'Doctor': return <DoctorDashboard />;
-    case 'Nurse': return <NurseDashboard />;
-    case 'LabStaff': return <LabStaffDashboard />;
-    case 'SeniorLabStaff': return <SeniorLabStaffDashboard />;
+    case 'Doctor': return <AdminDashboard />;
+    case 'Nurse': return <AdminDashboard />;
+    case 'LabStaff': return <AdminDashboard />;
+    case 'SeniorLabStaff': return <AdminDashboard />;
     default: return <div>Invalid role</div>;
   }
 }
