@@ -58,7 +58,7 @@ function App() {
 }
 
 function DashboardRouter() {
-  const auth = useAuth();
+  const {auth} = useAuth();
   console.log("DashboardRouter context:", auth);
 
   if (!auth?.user)  
