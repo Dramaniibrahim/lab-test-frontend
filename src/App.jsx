@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthContext, AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import Login from './pages/auth/Login';
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -58,22 +58,18 @@ function App() {
 }
 
 function DashboardRouter() {
-  const { user } = useContext(AuthContext);
-  console.log('DashboardRouter: user:', user);
-  if (!user) return null;
+  const auth = useAuth();
+  console.log("DashboardRouter context:", auth);
 
-  // Normalize role to uppercase
-  const role = user.role?.toUpperCase();
-  console.log('DashboardRouter: normalized role:', role);
-  switch (role) {
-    case 'ADMIN': return <AdminDashboard />;
-    case 'DOCTOR': return <AdminDashboard />;
-    case 'NURSE': return <AdminDashboard />;
-    case 'LAB_STAFF': return <AdminDashboard />;
-    case 'SENIOR_LAB_STAFF': return <AdminDashboard />;
-    default:
-      console.log('Invalid role:', role);
-      return <div>Invalid role</div>;
+  if (!auth?.user) return null;
+
+  switch (auth.user.role?.toLowerCase()) {
+    case 'admin': return <AdminDashboard />;
+    case 'doctor': return <DoctorDashboard />;
+    case 'nurse': return <NurseDashboard />;
+    case 'labstaff': return <LabStaffDashboard />;
+    case 'seniorlabstaff': return <SeniorLabStaffDashboard />;
+    default: return <div>Invalid role: {auth.user.role}</div>;
   }
 }
 
