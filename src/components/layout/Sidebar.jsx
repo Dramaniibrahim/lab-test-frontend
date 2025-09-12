@@ -22,6 +22,7 @@ import {
 
 export default function Sidebar() {
   const { user, logout } = useAuthContext();
+  console.log("Sidebar context:", user);
   const navigate = useNavigate();
   
   const handleLogout = async () => {
