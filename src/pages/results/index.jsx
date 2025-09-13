@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { LabResultDrawer } from "../../components/layout/Drawers";
-import { useLabResultsData } from "../../api/data";
-import axios from "../../api/axios";
+import { useLabResultsData } from "../../services/api/route-data";
+import axios from "../../services/api/axios";
 import {
   LAB_RESULTS_URL,
   LAB_RESULT_BY_ID_URL,
-} from "../../api/routes";
+} from "../../services/api/routes";
 import { useAuth } from "../../context/AuthContext";
 
 export default function ResultsList() {

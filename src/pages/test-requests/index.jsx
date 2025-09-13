@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { TestRequestDrawer } from "../../components/layout/Drawers";
-import axios from "../../api/axios";
+import axios from "../../services/api/axios";
 import {
   TEST_REQUESTS_URL,
   TEST_REQUEST_BY_ID_URL,
-} from "../../api/routes";
+} from "../../services/api/routes";
 import { useAuth } from "../../context/AuthContext";
-import { useTestRequestsData } from "../../api/data";
+import { useTestRequestsData } from "../../services/api/route-data";
 
 export default function TestRequestsList() {
   const { auth } = useAuth();

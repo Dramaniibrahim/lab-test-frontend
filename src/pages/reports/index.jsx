@@ -16,10 +16,10 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { usePatientsData } from "../../api/data";
-import { useTestRequestsData } from "../../api/data";
-import { useSamplesData } from "../../api/data";
-import { useTestResultsData } from "../../api/data";
+import { usePatientsData } from "../../services/api/route-data";
+import { useTestRequestsData } from "../../services/api/route-data";
+import { useSamplesData } from "../../services/api/route-data";
+import { useTestResultsData } from "../../services/api/route-data";
 
 export default function Reports() {
   const [selectedDate, setSelectedDate] = useState("September 2025");

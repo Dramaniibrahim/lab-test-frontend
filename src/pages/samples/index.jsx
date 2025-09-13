@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { SampleDrawer } from "../../components/layout/Drawers";
-import { useSamplesData } from "../../api/data";
-import axios from "../../api/axios";
+import { useSamplesData } from "../../services/api/route-data";
+import axios from "../../services/api/axios";
 import {
   SAMPLES_URL,
   SAMPLE_BY_ID_URL,
-} from "../../api/routes";
+} from "../../services/api/routes";
 import { useAuth } from "../../context/AuthContext";
 
 export default function SamplesList() {
