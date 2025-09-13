@@ -48,21 +48,36 @@ export const PatientDrawer = ({ isOpen, onClose, patientData, onSubmit }) => {
   const { auth } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (patientData) {
-      setForm({
-        name: patientData.name || "",
-        dob: patientData.dob ? patientData.dob.split("T")[0] : "",
-        gender: patientData.gender || "UNKNOWN",
-        phone: patientData.phone || "",
-        email: patientData.email || "",
-        address: patientData.address || "",
-        emergencyContact: patientData.emergencyContact || "",
-        medicalRecordNumber: patientData.medicalRecordNumber || "",
-        isActive: patientData.isActive ?? true,
-      });
-    }
-  }, [patientData]);
+  useEffect(() =>{
+      if (patientData) {
+        // Edit mode
+        setForm({
+          name: patientData.name || "",
+          dob: patientData.dob ? patientData.dob.split("T")[0] : "",
+          gender: patientData.gender || "UNKNOWN",
+          phone: patientData.phone || "",
+          email: patientData.email || "",
+          address: patientData.address || "",
+          emergencyContact: patientData.emergencyContact || "",
+          medicalRecordNumber: patientData.medicalRecordNumber || "",
+          isActive: patientData.isActive ?? true,
+        });
+      } else {
+        // Create mode → reset form
+        setForm({
+          name: "",
+          dob: "",
+          gender: "UNKNOWN",
+          phone: "",
+          email: "",
+          address: "",
+          emergencyContact: "",
+          medicalRecordNumber: "",
+          isActive: true,
+        });
+      }
+    }, [patientData, isOpen]);
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
