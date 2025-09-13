@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { CreatePatient } from "../../components/layout/Drawers";
 import { usePatientsData } from "../../services/api/route-data";
@@ -6,20 +6,33 @@ import { usePatientsData } from "../../services/api/route-data";
 export default function PatientsList() {
   const [selectedView, setSelectedView] = useState("Today");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [patientsList, setPatientsList] = useState([]);
 
-  // Normalize patients into an array, even if API returns an object
-  const { patients: rawPatients = [], fetchData = () => {} } = usePatientsData() || {};
+  // Fetch patients from hook
+  const { patients: rawPatients = [], fetchData = () => {} } = usePatientsData() || [];
+
+  // Normalize API response
   const patients = Array.isArray(rawPatients)
     ? rawPatients
     : rawPatients?.data && Array.isArray(rawPatients.data)
     ? rawPatients.data
     : [];
 
-  console.log("PatientsList normalized data:", patients);
+  // Initialize local state with API data
+  useEffect(() => {
+    setPatientsList(patients);
+  }, [patients]);
 
   const handleFormSubmit = (formData) => {
     console.log("Patient form submitted:", formData);
+
+    // Add new patient to local list
+    setPatientsList((prev) => [...prev, formData]);
+
+    // Optionally refetch from API if needed
     fetchData();
+
+    // Close drawer
     setIsDrawerOpen(false);
   };
 
@@ -85,13 +98,13 @@ export default function PatientsList() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {patients.length > 0 ? (
-              patients.map((patient) => (
-                <tr key={patient.id || patient.email} className="hover:bg-gray-50">
+            {patientsList.length > 0 ? (
+              patientsList.map((patient, index) => (
+                <tr key={patient.id || patient.email || index} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input type="checkbox" className="rounded border-gray-300" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.id || index + 1}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-4">
@@ -104,7 +117,7 @@ export default function PatientsList() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.age}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.dob}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.dob || "—"}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -113,11 +126,11 @@ export default function PatientsList() {
                           : "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      ● {patient.status}
+                      ● {patient.status || "Inactive"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.phone}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.email || "—"}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.phone || "—"}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex space-x-2">
                       <button className="text-blue-600 hover:text-blue-900">
