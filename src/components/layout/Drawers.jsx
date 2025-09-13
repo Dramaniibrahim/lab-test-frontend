@@ -370,7 +370,7 @@ export function EditPatientDrawer({ isOpen, onClose, onSubmit, patientData }) {
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
+      <div className="fixed inset-0" onClick={onClose}></div>
 
       {/* Drawer */}
       <div className="relative w-full max-w-md bg-white h-full shadow-xl overflow-y-auto">
