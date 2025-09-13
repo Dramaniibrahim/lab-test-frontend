@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { SampleDrawer } from "../../components/layout/Drawers";
 import { useSamplesData } from "../../services/api/route-data";
@@ -15,11 +15,17 @@ export default function SamplesList() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingSample, setEditingSample] = useState(null);
 
+  // Debug: log whenever samples change
+  useEffect(() => {
+    console.log("📦 Current samples state:", samples);
+  }, [samples]);
+
   // Handle create/update form submission
   const handleFormSubmit = async (formData) => {
+    console.log("📝 Submitting sample form data:", formData);
     try {
       if (editingSample) {
-        // Update sample
+        console.log("✏️ Updating sample with ID:", editingSample.id);
         await axios.put(SAMPLE_BY_ID_URL(editingSample.id), formData, {
           headers: {
             "Content-Type": "application/json",
@@ -28,7 +34,7 @@ export default function SamplesList() {
           withCredentials: true,
         });
       } else {
-        // Create new sample
+        console.log("➕ Creating new sample");
         await axios.post(SAMPLES_URL, formData, {
           headers: {
             "Content-Type": "application/json",
@@ -37,17 +43,19 @@ export default function SamplesList() {
           withCredentials: true,
         });
       }
+      console.log("✅ Sample saved successfully, refreshing data...");
       fetchData();
       setIsDrawerOpen(false);
       setEditingSample(null);
     } catch (err) {
-      console.error("Error saving sample:", err);
+      console.error("❌ Error saving sample:", err.response?.data || err);
     }
   };
 
   // Handle delete
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this sample?")) return;
+    console.log("🗑️ Deleting sample with ID:", id);
     try {
       await axios.delete(SAMPLE_BY_ID_URL(id), {
         headers: {
@@ -56,9 +64,10 @@ export default function SamplesList() {
         },
         withCredentials: true,
       });
+      console.log("✅ Sample deleted successfully, refreshing data...");
       fetchData();
     } catch (err) {
-      console.error("Error deleting sample:", err);
+      console.error("❌ Error deleting sample:", err.response?.data || err);
     }
   };
 
@@ -70,6 +79,7 @@ export default function SamplesList() {
           <h3 className="text-lg font-semibold text-gray-900">Samples Overview</h3>
           <button
             onClick={() => {
+              console.log("📂 Opening drawer for new sample");
               setEditingSample(null);
               setIsDrawerOpen(true);
             }}
@@ -113,6 +123,7 @@ export default function SamplesList() {
                       <button
                         className="text-blue-600 hover:text-blue-900"
                         onClick={() => {
+                          console.log("✏️ Editing sample:", sample);
                           setEditingSample(sample);
                           setIsDrawerOpen(true);
                         }}
@@ -144,6 +155,7 @@ export default function SamplesList() {
       <SampleDrawer
         isOpen={isDrawerOpen}
         onClose={() => {
+          console.log("📂 Closing drawer");
           setIsDrawerOpen(false);
           setEditingSample(null);
         }}
