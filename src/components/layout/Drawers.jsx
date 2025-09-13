@@ -206,18 +206,21 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
     e.preventDefault();
     setLoading(true);
     try {
+      const payload = { ...form };
+      console.log("Submitting TestRequest:", payload); // ✅ debug log
+
       if (isEditMode) {
-        await axios.put(`${TEST_REQUESTS_URL}/${testRequestData.id}`, form, {
+        await axios.put(`${TEST_REQUESTS_URL}/${testRequestData.id}`, payload, {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
           withCredentials: true,
         });
       } else {
-        await axios.post(TEST_REQUESTS_URL, form, {
+        await axios.post(TEST_REQUESTS_URL, payload, {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
           withCredentials: true,
         });
       }
-      onSubmit?.(form);
+      onSubmit?.(payload);
       onClose();
     } catch (err) {
       console.error("Error saving test request:", err);
@@ -226,6 +229,7 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
       setLoading(false);
     }
   };
+
 
   return (
     <DrawerWrapper title={isEditMode ? "Edit Test Request" : "Create Test Request"} onClose={onClose} isOpen={isOpen}>
@@ -330,18 +334,21 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
     e.preventDefault();
     setLoading(true);
     try {
+      const payload = { ...form };
+      console.log("Submitting Sample:", payload); // ✅ debug log
+
       if (isEditMode) {
-        await axios.put(`${SAMPLES_URL}/${sampleData.id}`, form, {
+        await axios.put(`${SAMPLES_URL}/${sampleData.id}`, payload, {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
           withCredentials: true,
         });
       } else {
-        await axios.post(SAMPLES_URL, form, {
+        await axios.post(SAMPLES_URL, payload, {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
           withCredentials: true,
         });
       }
-      onSubmit?.(form);
+      onSubmit?.(payload);
       onClose();
     } catch (err) {
       console.error("Error saving sample:", err);
@@ -350,6 +357,7 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
       setLoading(false);
     }
   };
+
 
   return (
     <DrawerWrapper title={isEditMode ? "Edit Sample" : "Create Sample"} onClose={onClose} isOpen={isOpen}>
@@ -441,8 +449,9 @@ export const LabResultDrawer = ({ isOpen, onClose, labResultData, onSubmit }) =>
     try {
       const payload = {
         ...form,
-        results: JSON.parse(form.results || "{}"), // ensure JSON
+        results: JSON.parse(form.results || "{}"), // parse JSON safely
       };
+      console.log("Submitting LabResult:", payload); // ✅ debug log
 
       if (isEditMode) {
         await axios.put(`${LAB_RESULTS_URL}/${labResultData.id}`, payload, {
@@ -464,7 +473,6 @@ export const LabResultDrawer = ({ isOpen, onClose, labResultData, onSubmit }) =>
       setLoading(false);
     }
   };
-
   return (
     <DrawerWrapper title={isEditMode ? "Edit Lab Result" : "Create Lab Result"} onClose={onClose} isOpen={isOpen}>
       <form className="space-y-4" onSubmit={handleSubmit}>
