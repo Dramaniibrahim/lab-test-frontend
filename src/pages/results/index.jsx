@@ -11,9 +11,16 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function ResultsList() {
   const { auth } = useAuth();
-  const { labResults, fetchData } = useLabResultsData();
+  const { labResults: rawLabResults, fetchData } = useLabResultsData();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingResult, setEditingResult] = useState(null);
+
+  // ✅ Normalize API response (handle both array or { data: { labResults } })
+  const labResults = Array.isArray(rawLabResults)
+    ? rawLabResults
+    : rawLabResults?.data?.labResults && Array.isArray(rawLabResults.data.labResults)
+    ? rawLabResults.data.labResults
+    : [];
 
   // Handle create/update form submission
   const handleFormSubmit = async (formData) => {
