@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { Plus, Edit, Trash2 } from "lucide-react";
-import { CreatePatient, EditPatientDrawer } from "../../components/layout/Drawers";
+import { PatientDrawer } from "../../components/layout/Drawers";
 import { usePatientsData } from "../../services/api/route-data";
 import {
   PATIENTS_URL,
@@ -234,22 +234,23 @@ export default function PatientsList() {
       </div>
 
       {/* Drawers */}
-      <CreatePatient
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        onSubmit={handleFormSubmit}
-      />
-
-      <EditPatientDrawer
-        isOpen={isEditDrawerOpen}
+      <PatientDrawer
+        isOpen={isDrawerOpen || isEditDrawerOpen}
         onClose={() => {
+          setIsDrawerOpen(false);
           setIsEditDrawerOpen(false);
           setEditingPatient(null);
         }}
-        patientData={editingPatient}
-        onSubmit={handleEditSubmit}
-        overlay={false} 
+        patientData={editingPatient} // undefined when creating
+        onSubmit={(data) => {
+          if (editingPatient) {
+            handleEditSubmit(data);
+          } else {
+            handleFormSubmit(data);
+          }
+        }}
       />
+
     </div>
   );
 }
