@@ -11,7 +11,14 @@ import { useTestRequestsData } from "../../services/api/route-data";
 
 export default function TestRequestsList() {
   const { auth } = useAuth();
-  const { testRequests, fetchData } = useTestRequestsData();
+  const { testRequests: rawTestRequests, fetchData } = useTestRequestsData();
+
+  // ✅ Normalize API response
+  const testRequests = Array.isArray(rawTestRequests)
+    ? rawTestRequests
+    : rawTestRequests?.data?.testRequests && Array.isArray(rawTestRequests.data.testRequests)
+    ? rawTestRequests.data.testRequests
+    : [];
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingRequest, setEditingRequest] = useState(null);
