@@ -98,59 +98,60 @@ export default function PatientsList() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {patientsList.length > 0 ? (
-              patientsList.map((patient, index) => (
-                <tr key={patient.id || patient.email || index} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <input type="checkbox" className="rounded border-gray-300" />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.id || index + 1}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-                        <span>{getAvatar(patient.gender)}</span>
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{patient.name}</div>
-                        <div className="text-sm text-gray-500">{patient.room || "—"}</div>
-                      </div>
+          {patientsList.length > 0 ? (
+            patientsList.map((patient, index) => (
+              <tr key={patient.id || patient.email || index} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <input type="checkbox" className="rounded border-gray-300" />
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.id || index + 1}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-4">
+                      <span>{getAvatar(patient.gender)}</span>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.age}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.dob || "—"}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        patient.status === "Active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      ● {patient.status || "Inactive"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.email || "—"}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.phone || "—"}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{patient.name}</div>
+                      <div className="text-sm text-gray-500">{patient.medicalRecordNumber || "—"}</div>
                     </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={9} className="px-6 py-4 text-center text-sm text-gray-500">
-                  No patients found.
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{computeAge(patient.dob)}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDob(patient.dob)}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      patient.isActive === true
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    ● {patient.status || "Inactive"}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.email || "—"}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.phone || "—"}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <div className="flex space-x-2">
+                    <button className="text-blue-600 hover:text-blue-900">
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button className="text-red-600 hover:text-red-900">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </td>
               </tr>
-            )}
-          </tbody>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={9} className="px-6 py-4 text-center text-sm text-gray-500">
+                No patients found.
+              </td>
+            </tr>
+          )}
+        </tbody>
+
         </table>
       </div>
 
