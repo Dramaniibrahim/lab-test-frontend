@@ -15,7 +15,7 @@ export default function ResultsList() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingResult, setEditingResult] = useState(null);
 
-  // ✅ Normalize API response (handle both array or { data: { labResults } })
+  // ✅ Normalize API response
   const labResults = Array.isArray(rawLabResults)
     ? rawLabResults
     : rawLabResults?.data?.labResults && Array.isArray(rawLabResults.data.labResults)
@@ -26,7 +26,6 @@ export default function ResultsList() {
   const handleFormSubmit = async (formData) => {
     try {
       if (editingResult) {
-        // Update existing lab result
         await axios.put(LAB_RESULT_BY_ID_URL(editingResult.id), formData, {
           headers: {
             "Content-Type": "application/json",
@@ -35,7 +34,6 @@ export default function ResultsList() {
           withCredentials: true,
         });
       } else {
-        // Create new lab result
         await axios.post(LAB_RESULTS_URL, formData, {
           headers: {
             "Content-Type": "application/json",
@@ -96,9 +94,10 @@ export default function ResultsList() {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3"></th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sample ID</th>
+              <th className="px-6 py-3">
+                <input type="checkbox" className="rounded border-gray-300" />
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Results</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Interpretation</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Flags</th>
@@ -108,13 +107,13 @@ export default function ResultsList() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {labResults.length > 0 ? (
-              labResults.map((result) => (
+              labResults.map((result, index) => (
                 <tr key={result.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <input type="checkbox" className="rounded border-gray-300" />
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{result.id}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{result.sampleId}</td>
+                  {/* Auto numbering */}
+                  <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">
                     {result.results ? JSON.stringify(result.results) : "-"}
                   </td>
@@ -146,7 +145,7 @@ export default function ResultsList() {
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-6 py-4 text-center text-gray-500">
+                <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
                   No lab results found
                 </td>
               </tr>
@@ -163,7 +162,7 @@ export default function ResultsList() {
           setEditingResult(null);
         }}
         onSubmit={handleFormSubmit}
-        resultData={editingResult} // pre-fill when editing
+        resultData={editingResult}
       />
     </div>
   );

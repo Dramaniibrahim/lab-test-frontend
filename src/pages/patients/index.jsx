@@ -1,11 +1,8 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { PatientDrawer } from "../../components/layout/Drawers";
 import { usePatientsData } from "../../services/api/route-data";
-import {
-  PATIENTS_URL,
-  PATIENT_BY_ID_URL,
-} from "../../services/api/routes";
+import { PATIENTS_URL, PATIENT_BY_ID_URL } from "../../services/api/routes";
 import { useAuth } from "../../context/AuthContext";
 import axios from "../../services/api/axios";
 
@@ -157,7 +154,7 @@ export default function PatientsList() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <input type="checkbox" className="rounded border-gray-300" />
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date of Birth</th>
@@ -174,7 +171,8 @@ export default function PatientsList() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input type="checkbox" className="rounded border-gray-300" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.id || index + 1}</td>
+                  {/* Auto numbering */}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{index + 1}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-4">
@@ -241,7 +239,7 @@ export default function PatientsList() {
           setIsEditDrawerOpen(false);
           setEditingPatient(null);
         }}
-        patientData={editingPatient} // undefined when creating
+        patientData={editingPatient}
         onSubmit={(data) => {
           if (editingPatient) {
             handleEditSubmit(data);
@@ -250,7 +248,6 @@ export default function PatientsList() {
           }
         }}
       />
-
     </div>
   );
 }
