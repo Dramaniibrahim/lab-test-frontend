@@ -19,7 +19,7 @@ import {
 import { usePatientsData } from "../../services/api/route-data";
 import { useTestRequestsData } from "../../services/api/route-data";
 import { useSamplesData } from "../../services/api/route-data";
-import { useTestResultsData } from "../../services/api/route-data";
+import { useLabResultsData } from "../../services/api/route-data";
 
 export default function Reports() {
   const [selectedDate, setSelectedDate] = useState("September 2025");
@@ -29,7 +29,7 @@ export default function Reports() {
   const { patients } = usePatientsData();
   const { testRequests } = useTestRequestsData();
   const { samples } = useSamplesData();
-  const { testResults } = useTestResultsData();
+  const { testResults } = useLabResultsData();
 
   // Generate chart data (patients + testResults per weekday)
   const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
