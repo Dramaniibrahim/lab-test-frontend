@@ -1,11 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Plus, Edit, Trash2 } from "lucide-react";
-import { CreatePatient } from "../../components/layout/Drawers";
+import { CreatePatient, EditPatientDrawer } from "../../components/layout/Drawers";
 import { usePatientsData } from "../../services/api/route-data";
+import {
+  PATIENTS_URL,
+  PATIENT_BY_ID_URL,
+} from "../../services/api/routes";
+import { useAuth } from "../../context/AuthContext";
+import axios from "../../services/api/axios";
 
 export default function PatientsList() {
+  const { auth } = useAuth();
   const [selectedView, setSelectedView] = useState("Today");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const [editingPatient, setEditingPatient] = useState(null);
   const [patientsList, setPatientsList] = useState([]);
 
   // Fetch patients from hook
@@ -23,19 +32,7 @@ export default function PatientsList() {
     setPatientsList(patients);
   }, [patients]);
 
-  const handleFormSubmit = (formData) => {
-    console.log("Patient form submitted:", formData);
-
-    // Add new patient to local list
-    setPatientsList((prev) => [...prev, formData]);
-
-    // Optionally refetch from API if needed
-    fetchData();
-
-    // Close drawer
-    setIsDrawerOpen(false);
-  };
-
+  // ---------- UTILITIES ----------
   const getAvatar = (gender) => {
     if (!gender) return "👤";
     return gender.toLowerCase() === "female" ? "👩" : "👨";
@@ -52,12 +49,68 @@ export default function PatientsList() {
     }
     return age;
   };
+
   const formatDob = (dob) => {
     if (!dob) return "—";
-    return dob.split("T")[0]; // keeps only YYYY-MM-DD
+    return dob.split("T")[0];
   };
 
+  // ---------- CREATE ----------
+  const handleFormSubmit = (formData) => {
+    setPatientsList((prev) => [...prev, formData]);
+    fetchData();
+    setIsDrawerOpen(false);
+  };
 
+  // ---------- EDIT ----------
+  const handleEditSubmit = async (updatedData) => {
+    if (!editingPatient?.id) return;
+
+    try {
+      const response = await axios.put(PATIENT_BY_ID_URL(editingPatient.id), updatedData, {
+        headers: { Authorization: `Bearer ${auth.token}` },
+      });
+
+      const result = response.data;
+
+      if (result.success) {
+        setPatientsList((prev) =>
+          prev.map((p) => (p.id === editingPatient.id ? { ...p, ...updatedData } : p))
+        );
+        setIsEditDrawerOpen(false);
+        setEditingPatient(null);
+      } else {
+        console.error("Failed to update patient:", result.message);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ---------- DELETE ----------
+  const handleDelete = async (patientId) => {
+    if (!patientId) return;
+
+    if (!confirm("Are you sure you want to delete this patient?")) return;
+
+    try {
+      const response = await axios.delete(PATIENT_BY_ID_URL(patientId), {
+        headers: { Authorization: `Bearer ${auth.token}` },
+      });
+
+      const result = response.data;
+
+      if (result.success) {
+        setPatientsList((prev) => prev.filter((p) => p.id !== patientId));
+      } else {
+        console.error("Failed to delete patient:", result.message);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ---------- RENDER ----------
   return (
     <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 relative">
       {/* Header */}
@@ -115,68 +168,86 @@ export default function PatientsList() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-          {patientsList.length > 0 ? (
-            patientsList.map((patient, index) => (
-              <tr key={patient.id || patient.email || index} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <input type="checkbox" className="rounded border-gray-300" />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.id || index + 1}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-                      <span>{getAvatar(patient.gender)}</span>
+            {patientsList.length > 0 ? (
+              patientsList.map((patient, index) => (
+                <tr key={patient.id || patient.email || index} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <input type="checkbox" className="rounded border-gray-300" />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.id || index + 1}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-4">
+                        <span>{getAvatar(patient.gender)}</span>
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{patient.name}</div>
+                        <div className="text-sm text-gray-500">{patient.medicalRecordNumber || "—"}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{patient.name}</div>
-                      <div className="text-sm text-gray-500">{patient.medicalRecordNumber || "—"}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{computeAge(patient.dob)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDob(patient.dob)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        patient.isActive === true
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      ● {patient.status || "Inactive"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.email || "—"}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.phone || "—"}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <div className="flex space-x-2">
+                      <button
+                        className="text-blue-600 hover:text-blue-900"
+                        onClick={() => {
+                          setEditingPatient(patient);
+                          setIsEditDrawerOpen(true);
+                        }}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        className="text-red-600 hover:text-red-900"
+                        onClick={() => handleDelete(patient.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{computeAge(patient.dob)}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDob(patient.dob)}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      patient.isActive === true
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    ● {patient.status || "Inactive"}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.email || "—"}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.phone || "—"}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <div className="flex space-x-2">
-                    <button className="text-blue-600 hover:text-blue-900">
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button className="text-red-600 hover:text-red-900">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={9} className="px-6 py-4 text-center text-sm text-gray-500">
+                  No patients found.
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={9} className="px-6 py-4 text-center text-sm text-gray-500">
-                No patients found.
-              </td>
-            </tr>
-          )}
-        </tbody>
-
+            )}
+          </tbody>
         </table>
       </div>
 
-      {/* Drawer */}
+      {/* Drawers */}
       <CreatePatient
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         onSubmit={handleFormSubmit}
+      />
+
+      <EditPatientDrawer
+        isOpen={isEditDrawerOpen}
+        onClose={() => {
+          setIsEditDrawerOpen(false);
+          setEditingPatient(null);
+        }}
+        patientData={editingPatient}
+        onSubmit={handleEditSubmit}
       />
     </div>
   );
