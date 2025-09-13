@@ -41,6 +41,19 @@ export default function PatientsList() {
     return gender.toLowerCase() === "female" ? "👩" : "👨";
   };
 
+  const computeAge = (dob) => {
+    if (!dob) return "—";
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+
   return (
     <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 relative">
       {/* Header */}
