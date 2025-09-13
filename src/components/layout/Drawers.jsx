@@ -7,12 +7,11 @@ import {
   SAMPLES_URL,
   LAB_RESULTS_URL,
 } from "../../services/api/routes";
-
 import { useAuth } from "../../context/AuthContext";
 
 // ---------------- DRAWER WRAPPER ----------------
 const DrawerWrapper = ({ title, children, onClose, isOpen }) => {
-  if (!isOpen) return null; // <-- keeps drawer hidden until open
+  if (!isOpen) return null; // <-- only render when open
 
   return (
     <div className="fixed inset-0 flex justify-end z-50">
@@ -29,9 +28,8 @@ const DrawerWrapper = ({ title, children, onClose, isOpen }) => {
   );
 };
 
-
 // ---------------- CREATE PATIENT ----------------
-export const CreatePatient = ({ onClose, onSubmit }) => {
+export const CreatePatient = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     name: "",
     gender: "male",
@@ -47,10 +45,7 @@ export const CreatePatient = ({ onClose, onSubmit }) => {
     setLoading(true);
     try {
       await axios.post(PATIENTS_URL, formData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth.token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         withCredentials: true,
       });
       onSubmit?.(formData);
@@ -65,7 +60,7 @@ export const CreatePatient = ({ onClose, onSubmit }) => {
   };
 
   return (
-    <DrawerWrapper title="Create Patient" onClose={onClose}>
+    <DrawerWrapper title="Create Patient" onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
@@ -95,9 +90,7 @@ export const CreatePatient = ({ onClose, onSubmit }) => {
           type="text"
           placeholder="Contact"
           value={formData.contact}
-          onChange={(e) =>
-            setFormData({ ...formData, contact: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
           className="w-full border rounded p-2"
         />
         <button
@@ -113,12 +106,8 @@ export const CreatePatient = ({ onClose, onSubmit }) => {
 };
 
 // ---------------- CREATE TEST REQUEST ----------------
-export const CreateTestRequest = ({ onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    patientId: "",
-    testType: "",
-    notes: "",
-  });
+export const CreateTestRequest = ({ isOpen, onClose, onSubmit }) => {
+  const [formData, setFormData] = useState({ patientId: "", testType: "", notes: "" });
   const [loading, setLoading] = useState(false);
   const { auth } = useAuth();
 
@@ -127,10 +116,7 @@ export const CreateTestRequest = ({ onClose, onSubmit }) => {
     setLoading(true);
     try {
       await axios.post(TEST_REQUESTS_URL, formData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth.token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         withCredentials: true,
       });
       onSubmit?.(formData);
@@ -144,15 +130,13 @@ export const CreateTestRequest = ({ onClose, onSubmit }) => {
   };
 
   return (
-    <DrawerWrapper title="Create Test Request" onClose={onClose}>
+    <DrawerWrapper title="Create Test Request" onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
           placeholder="Patient ID"
           value={formData.patientId}
-          onChange={(e) =>
-            setFormData({ ...formData, patientId: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
           className="w-full border rounded p-2"
           required
         />
@@ -160,9 +144,7 @@ export const CreateTestRequest = ({ onClose, onSubmit }) => {
           type="text"
           placeholder="Test Type"
           value={formData.testType}
-          onChange={(e) =>
-            setFormData({ ...formData, testType: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, testType: e.target.value })}
           className="w-full border rounded p-2"
           required
         />
@@ -185,12 +167,8 @@ export const CreateTestRequest = ({ onClose, onSubmit }) => {
 };
 
 // ---------------- CREATE SAMPLE ----------------
-export const CreateSample = ({ onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    testRequestId: "",
-    sampleType: "",
-    collectedBy: "",
-  });
+export const CreateSample = ({ isOpen, onClose, onSubmit }) => {
+  const [formData, setFormData] = useState({ testRequestId: "", sampleType: "", collectedBy: "" });
   const [loading, setLoading] = useState(false);
   const { auth } = useAuth();
 
@@ -199,10 +177,7 @@ export const CreateSample = ({ onClose, onSubmit }) => {
     setLoading(true);
     try {
       await axios.post(SAMPLES_URL, formData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth.token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         withCredentials: true,
       });
       onSubmit?.(formData);
@@ -216,15 +191,13 @@ export const CreateSample = ({ onClose, onSubmit }) => {
   };
 
   return (
-    <DrawerWrapper title="Create Sample" onClose={onClose}>
+    <DrawerWrapper title="Create Sample" onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
           placeholder="Test Request ID"
           value={formData.testRequestId}
-          onChange={(e) =>
-            setFormData({ ...formData, testRequestId: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, testRequestId: e.target.value })}
           className="w-full border rounded p-2"
           required
         />
@@ -232,9 +205,7 @@ export const CreateSample = ({ onClose, onSubmit }) => {
           type="text"
           placeholder="Sample Type"
           value={formData.sampleType}
-          onChange={(e) =>
-            setFormData({ ...formData, sampleType: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, sampleType: e.target.value })}
           className="w-full border rounded p-2"
           required
         />
@@ -242,9 +213,7 @@ export const CreateSample = ({ onClose, onSubmit }) => {
           type="text"
           placeholder="Collected By"
           value={formData.collectedBy}
-          onChange={(e) =>
-            setFormData({ ...formData, collectedBy: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, collectedBy: e.target.value })}
           className="w-full border rounded p-2"
         />
         <button
@@ -260,12 +229,8 @@ export const CreateSample = ({ onClose, onSubmit }) => {
 };
 
 // ---------------- CREATE LAB RESULT ----------------
-export const CreateLabResult = ({ onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    sampleId: "",
-    result: "",
-    remarks: "",
-  });
+export const CreateLabResult = ({ isOpen, onClose, onSubmit }) => {
+  const [formData, setFormData] = useState({ sampleId: "", result: "", remarks: "" });
   const [loading, setLoading] = useState(false);
   const { auth } = useAuth();
 
@@ -274,10 +239,7 @@ export const CreateLabResult = ({ onClose, onSubmit }) => {
     setLoading(true);
     try {
       await axios.post(LAB_RESULTS_URL, formData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth.token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         withCredentials: true,
       });
       onSubmit?.(formData);
@@ -291,15 +253,13 @@ export const CreateLabResult = ({ onClose, onSubmit }) => {
   };
 
   return (
-    <DrawerWrapper title="Create Lab Result" onClose={onClose}>
+    <DrawerWrapper title="Create Lab Result" onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
           placeholder="Sample ID"
           value={formData.sampleId}
-          onChange={(e) =>
-            setFormData({ ...formData, sampleId: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, sampleId: e.target.value })}
           className="w-full border rounded p-2"
           required
         />
@@ -313,9 +273,7 @@ export const CreateLabResult = ({ onClose, onSubmit }) => {
         <textarea
           placeholder="Remarks"
           value={formData.remarks}
-          onChange={(e) =>
-            setFormData({ ...formData, remarks: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
           className="w-full border rounded p-2"
         />
         <button
@@ -329,3 +287,4 @@ export const CreateLabResult = ({ onClose, onSubmit }) => {
     </DrawerWrapper>
   );
 };
+
