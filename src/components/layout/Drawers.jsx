@@ -9,27 +9,31 @@ import {
 } from "../../services/api/routes";
 import { useAuth } from "../../context/AuthContext";
 
-
-
 // ---------------- DRAWER WRAPPER ----------------
 const DrawerWrapper = ({ title, children, onClose, isOpen }) => {
-  if (!isOpen) return null; // ⬅️ prevents always rendering
+  if (!isOpen) return null; // prevents always rendering
 
   return (
     <div className="fixed inset-0 flex justify-end z-50">
-      <div className="w-full max-w-lg bg-white h-full shadow-xl flex flex-col">
+      {/* Overlay behind the drawer */}
+      <div
+        className="absolute inset-0 bg-black bg-opacity-40"
+        onClick={onClose}
+      ></div>
+
+      {/* Drawer panel */}
+      <div className="relative w-full max-w-lg bg-white h-full shadow-xl flex flex-col">
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold">{title}</h2>
-          <button onClick={onClose} className="text-gray-600 hover:text-gray-900">
+          <button
+            onClick={onClose}
+            className="text-gray-600 hover:text-gray-900"
+          >
             ✕
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-4">{children}</div>
       </div>
-      <div
-        className="fixed inset-0 bg-black bg-opacity-40"
-        onClick={onClose}
-      ></div>
     </div>
   );
 };
