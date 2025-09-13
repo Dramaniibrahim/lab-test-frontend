@@ -57,7 +57,7 @@ export function usePatientsData() {
 
 
 export function usePatientByIdData(id) {
-  const { auth } = useContext(useAuthContext);
+  const { auth } = useAuth();
   const [patient, setPatient] = useState(null);
 
   useEffect(() => {
@@ -82,7 +82,7 @@ export function usePatientByIdData(id) {
 }
 
 export function usePatientStats() {
-  const { auth } = useContext(AuthContext);
+  const { auth } = useAuth();
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
@@ -108,7 +108,7 @@ export function usePatientStats() {
 
 /************************************************ Test Requests *************************************/
 export function useTestRequestsData() {
-  const { auth } = useContext(AuthContext);
+  const { auth } = useAuth();
   const [testRequests, setTestRequests] = useState([]);
 
   const fetchData = async () => {
@@ -134,7 +134,7 @@ export function useTestRequestsData() {
 }
 
 export function useTestRequestById(id) {
-  const { auth } = useContext(AuthContext);
+  const { auth } = useAuth();
   const [testRequest, setTestRequest] = useState(null);
 
   useEffect(() => {
@@ -159,7 +159,7 @@ export function useTestRequestById(id) {
 }
 
 export function useTestRequestSummary() {
-  const { auth } = useContext(AuthContext);
+  const { auth } = useAuth();
   const [summary, setSummary] = useState(null);
 
   useEffect(() => {
@@ -185,7 +185,7 @@ export function useTestRequestSummary() {
 
 /************************************************ Samples *************************************/
 export function useSamplesData() {
-  const { auth } = useContext(AuthContext);
+  const { auth } = useAuth();
   const [samples, setSamples] = useState([]);
 
   const fetchData = async () => {
@@ -211,7 +211,7 @@ export function useSamplesData() {
 }
 
 export function useSampleById(id) {
-  const { auth } = useContext(AuthContext);
+  const { auth } = useAuth();
   const [sample, setSample] = useState(null);
 
   useEffect(() => {
@@ -237,7 +237,7 @@ export function useSampleById(id) {
 
 /************************************************ Lab Results *************************************/
 export function useLabResultsData() {
-  const { auth } = useContext(AuthContext);
+  const { auth } = useAuth();
   const [labResults, setLabResults] = useState([]);
 
   const fetchData = async () => {
@@ -263,7 +263,7 @@ export function useLabResultsData() {
 }
 
 export function useLabResultById(id) {
-  const { auth } = useContext(AuthContext);
+  const { auth } = useAuth();
   const [labResult, setLabResult] = useState(null);
 
   useEffect(() => {
