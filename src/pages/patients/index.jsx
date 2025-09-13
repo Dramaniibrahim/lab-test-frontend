@@ -248,6 +248,7 @@ export default function PatientsList() {
         }}
         patientData={editingPatient}
         onSubmit={handleEditSubmit}
+        overlay={false} 
       />
     </div>
   );

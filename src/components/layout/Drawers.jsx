@@ -322,176 +322,101 @@ export const CreateLabResult = ({ isOpen, onClose, onSubmit }) => {
 
 //---------------- Patients -----------------------------
 
-export function EditPatientDrawer({ isOpen, onClose, onSubmit, patientData }) {
-  const [form, setForm] = useState({
+export default function EditPatientDrawer({ isOpen, onClose, patientData, onSubmit }) {
+  const [formData, setFormData] = useState({
     name: "",
     dob: "",
-    gender: "UNKNOWN",
+    gender: "",
     phone: "",
     email: "",
     address: "",
     emergencyContact: "",
     medicalRecordNumber: "",
+    isActive: true, // default to active
   });
 
   useEffect(() => {
     if (patientData) {
-      setForm({
-        name: patientData.name || "",
-        dob: patientData.dob ? patientData.dob.split("T")[0] : "",
-        gender: patientData.gender || "UNKNOWN",
-        phone: patientData.phone || "",
-        email: patientData.email || "",
-        address: patientData.address || "",
-        emergencyContact: patientData.emergencyContact || "",
-        medicalRecordNumber: patientData.medicalRecordNumber || "",
+      setFormData({
+        ...patientData,
+        isActive: patientData.isActive ?? true, // default true if undefined
       });
     }
   }, [patientData]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form); // Pass form data back to parent
+    onSubmit(formData);
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      {/* Overlay */}
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50"
-        onClick={onClose}
-      ></div>
+      <div className="bg-white w-96 p-6 overflow-y-auto">
+        <h3 className="text-lg font-semibold mb-4">Edit Patient</h3>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Name"
+            className="w-full border p-2 rounded"
+          />
+          <input
+            type="date"
+            name="dob"
+            value={formData.dob?.split("T")[0] || ""}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+          />
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+          >
+            <option value="">Select Gender</option>
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <option value="OTHER">Other</option>
+            <option value="UNKNOWN">Unknown</option>
+          </select>
 
-      {/* Drawer */}
-      <div className="relative w-full max-w-md bg-white h-full shadow-xl overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Edit Patient</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X className="w-5 h-5" />
+          {/* isActive Toggle */}
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              name="isActive"
+              checked={formData.isActive}
+              onChange={handleChange}
+              className="w-4 h-4"
+            />
+            <label className="text-sm">Active</label>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          >
+            Save Changes
           </button>
-        </div>
-
-        {/* Form */}
-        <form className="p-6 space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
-            <input
-              type="date"
-              name="dob"
-              value={form.dob}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Gender</label>
-            <select
-              name="gender"
-              value={form.gender}
-              onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            >
-              <option value="MALE">Male</option>
-              <option value="FEMALE">Female</option>
-              <option value="OTHER">Other</option>
-              <option value="UNKNOWN">Unknown</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Phone</label>
-            <input
-              type="text"
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Address</label>
-            <input
-              type="text"
-              name="address"
-              value={form.address}
-              onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Emergency Contact</label>
-            <input
-              type="text"
-              name="emergencyContact"
-              value={form.emergencyContact}
-              onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Medical Record Number</label>
-            <input
-              type="text"
-              name="medicalRecordNumber"
-              value={form.medicalRecordNumber}
-              onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-end space-x-2 mt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Save Changes
-            </button>
-          </div>
         </form>
+        <button
+          onClick={onClose}
+          className="mt-4 w-full text-gray-700 border py-2 rounded hover:bg-gray-100"
+        >
+          Cancel
+        </button>
       </div>
     </div>
   );
