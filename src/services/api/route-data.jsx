@@ -26,7 +26,7 @@ export function usePatientsData() {
 
   const fetchData = async () => {
     try {
-      console.log("Fetching patients with token:", auth?.token); // log token presence
+      console.log("Fetching patients with token:", auth?.token);
       const response = await axios.get(PATIENTS_URL, {
         headers: {
           "Content-Type": "application/json",
@@ -34,10 +34,13 @@ export function usePatientsData() {
         },
         withCredentials: true,
       });
-      console.log("Raw response from API:", response); // log full response
-      console.log("Response data property:", response.data); // log data property
-      console.log("Response data.data property:", response.data.data); // log the actual patients array
-      setPatients(response.data.data || []);
+      console.log("Raw response:", response);
+      
+      // Correct path to patients array
+      const patientsArray = response.data?.data?.patients || [];
+      console.log("Patients array:", patientsArray);
+
+      setPatients(patientsArray);
     } catch (err) {
       console.error("Error fetching patients:", err);
     }
@@ -49,6 +52,7 @@ export function usePatientsData() {
 
   return { patients, fetchData };
 }
+
 
 
 
