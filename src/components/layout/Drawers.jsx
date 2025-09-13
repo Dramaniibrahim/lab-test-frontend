@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import axios from "../../services/api/axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -10,23 +10,25 @@ import {
 
 import { useAuth } from "../../context/AuthContext";
 
-const DrawerWrapper = ({ title, children, onClose }) => (
-  <div className="fixed inset-0 flex justify-end z-50">
-    <div className="w-full max-w-lg bg-white h-full shadow-xl flex flex-col">
-      <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        <button onClick={onClose} className="text-gray-600 hover:text-gray-900">
-          ✕
-        </button>
+// ---------------- DRAWER WRAPPER ----------------
+const DrawerWrapper = ({ title, children, onClose, isOpen }) => {
+  if (!isOpen) return null; // <-- keeps drawer hidden until open
+
+  return (
+    <div className="fixed inset-0 flex justify-end z-50">
+      <div className="w-full max-w-lg bg-white h-full shadow-xl flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b">
+          <h2 className="text-lg font-semibold">{title}</h2>
+          <button onClick={onClose} className="text-gray-600 hover:text-gray-900">
+            ✕
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4">{children}</div>
       </div>
-      <div className="flex-1 overflow-y-auto p-4">{children}</div>
     </div>
-    <div
-      className="fixed inset-0 bg-black bg-opacity-40"
-      onClick={onClose}
-    ></div>
-  </div>
-);
+  );
+};
+
 
 // ---------------- CREATE PATIENT ----------------
 export const CreatePatient = ({ onClose, onSubmit }) => {
