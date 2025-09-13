@@ -66,10 +66,10 @@ export default function Sidebar() {
                   <ChevronRight className="w-4 h-4" />
                 </div>
 
-                <div className="flex items-center space-x-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
+                {/*<div className="flex items-center space-x-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
                   <div className="w-4 h-4 bg-gray-400 rounded"></div>
                   <span>Appointment</span>
-                </div>
+                </div>*/}
 
                 <div className="flex items-center space-x-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
                   <Users className="w-4 h-4" />

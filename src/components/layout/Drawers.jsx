@@ -144,6 +144,7 @@ export const PatientDrawer = ({ isOpen, onClose, patientData, onSubmit }) => {
 };
 
 // ---------------- TEST REQUEST DRAWER ----------------
+// ---------------- TEST REQUEST DRAWER ----------------
 export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }) => {
   const isEditMode = !!testRequestData;
   const [form, setForm] = useState({
@@ -156,6 +157,7 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
   });
   const [loading, setLoading] = useState(false);
   const [patients, setPatients] = useState([]);
+  const [testTypes, setTestTypes] = useState([]);
   const { auth } = useAuth();
 
   // Fetch patients for dropdown
@@ -172,6 +174,22 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
       }
     };
     if (auth?.token) fetchPatients();
+  }, [auth]);
+
+  // Fetch active test types for dropdown
+  useEffect(() => {
+    const fetchTestTypes = async () => {
+      try {
+        const res = await axios.get("/test-types/active", {
+          headers: { Authorization: `Bearer ${auth.token}` },
+          withCredentials: true,
+        });
+        setTestTypes(res.data?.data?.testTypes || []);
+      } catch (err) {
+        console.error("Error fetching test types:", err);
+      }
+    };
+    if (auth?.token) fetchTestTypes();
   }, [auth]);
 
   // Populate form when editing / reset when creating
@@ -230,33 +248,85 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
     }
   };
 
-
   return (
     <DrawerWrapper title={isEditMode ? "Edit Test Request" : "Create Test Request"} onClose={onClose} isOpen={isOpen}>
       <form className="space-y-4" onSubmit={handleSubmit}>
         {/* Patient Dropdown */}
-        <select name="patientId" value={form.patientId} onChange={handleChange} required className="w-full border rounded p-2">
+        <select
+          name="patientId"
+          value={form.patientId}
+          onChange={handleChange}
+          required
+          className="w-full border rounded p-2"
+        >
           <option value="">Select Patient</option>
           {patients.map((p) => (
             <option key={p.id} value={p.id}>{p.name}</option>
           ))}
         </select>
 
-        <input type="text" name="testType" value={form.testType} onChange={handleChange} placeholder="Test Type" required className="w-full border rounded p-2" />
+        {/* Test Type Dropdown (shows name, sends ID) */}
+        <select
+          name="testType"
+          value={form.testType}
+          onChange={handleChange}
+          required
+          className="w-full border rounded p-2"
+        >
+          <option value="">Select Test Type</option>
+          {testTypes.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name}
+            </option>
+          ))}
+        </select>
 
-        <select name="priority" value={form.priority} onChange={handleChange} className="w-full border rounded p-2">
+        <select
+          name="priority"
+          value={form.priority}
+          onChange={handleChange}
+          className="w-full border rounded p-2"
+        >
           <option value="ROUTINE">Routine</option>
           <option value="URGENT">Urgent</option>
           <option value="STAT">Stat</option>
         </select>
 
-        <textarea name="clinicalInfo" value={form.clinicalInfo} onChange={handleChange} placeholder="Clinical Info" className="w-full border rounded p-2" />
-        <textarea name="instructions" value={form.instructions} onChange={handleChange} placeholder="Instructions" className="w-full border rounded p-2" />
-        <textarea name="notes" value={form.notes} onChange={handleChange} placeholder="Notes" className="w-full border rounded p-2" />
+        <textarea
+          name="clinicalInfo"
+          value={form.clinicalInfo}
+          onChange={handleChange}
+          placeholder="Clinical Info"
+          className="w-full border rounded p-2"
+        />
+        <textarea
+          name="instructions"
+          value={form.instructions}
+          onChange={handleChange}
+          placeholder="Instructions"
+          className="w-full border rounded p-2"
+        />
+        <textarea
+          name="notes"
+          value={form.notes}
+          onChange={handleChange}
+          placeholder="Notes"
+          className="w-full border rounded p-2"
+        />
 
         <div className="flex justify-end space-x-2 mt-4">
-          <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Cancel</button>
-          <button type="submit" disabled={loading} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
             {loading ? "Saving..." : isEditMode ? "Save Changes" : "Save Request"}
           </button>
         </div>
@@ -264,6 +334,7 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
     </DrawerWrapper>
   );
 };
+
 
 
 // ---------------- SAMPLE DRAWER ----------------
