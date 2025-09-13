@@ -52,6 +52,10 @@ export default function PatientsList() {
     }
     return age;
   };
+  const formatDob = (dob) => {
+    if (!dob) return "—";
+    return dob.split("T")[0]; // keeps only YYYY-MM-DD
+  };
 
 
   return (
