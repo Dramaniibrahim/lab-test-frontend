@@ -3,26 +3,34 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 import { SampleDrawer } from "../../components/layout/Drawers";
 import { useSamplesData } from "../../services/api/route-data";
 import axios from "../../services/api/axios";
-import {
-  SAMPLES_URL,
-  SAMPLE_BY_ID_URL,
-} from "../../services/api/routes";
+import { SAMPLES_URL, SAMPLE_BY_ID_URL } from "../../services/api/routes";
 import { useAuth } from "../../context/AuthContext";
 
 export default function SamplesList() {
   const { auth } = useAuth();
-  const { samples, fetchData } = useSamplesData();
+
+  // 🔍 Hook data
+  const { samples: rawSamples = [], fetchData = () => {} } = useSamplesData() || [];
+
+  // Debug logs
+  console.log("🔥 Raw samples from hook:", rawSamples);
+
+  // Normalize API response
+  const samples = Array.isArray(rawSamples)
+    ? rawSamples
+    : rawSamples?.data && Array.isArray(rawSamples.data)
+    ? rawSamples.data
+    : [];
+
+  console.log("✅ Normalized samples array:", samples);
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingSample, setEditingSample] = useState(null);
 
-  // Debug: log whenever samples change
-  useEffect(() => {
-    console.log("📦 Current samples state:", samples);
-  }, [samples]);
-
   // Handle create/update form submission
   const handleFormSubmit = async (formData) => {
-    console.log("📝 Submitting sample form data:", formData);
+    console.log("📤 Submitting form data:", formData);
+
     try {
       if (editingSample) {
         console.log("✏️ Updating sample with ID:", editingSample.id);
@@ -43,20 +51,22 @@ export default function SamplesList() {
           withCredentials: true,
         });
       }
-      console.log("✅ Sample saved successfully, refreshing data...");
+
+      console.log("🔄 Refetching samples after save...");
       fetchData();
       setIsDrawerOpen(false);
       setEditingSample(null);
     } catch (err) {
-      console.error("❌ Error saving sample:", err.response?.data || err);
+      console.error("❌ Error saving sample:", err);
     }
   };
 
   // Handle delete
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this sample?")) return;
-    console.log("🗑️ Deleting sample with ID:", id);
+
     try {
+      console.log("🗑️ Deleting sample with ID:", id);
       await axios.delete(SAMPLE_BY_ID_URL(id), {
         headers: {
           "Content-Type": "application/json",
@@ -64,10 +74,10 @@ export default function SamplesList() {
         },
         withCredentials: true,
       });
-      console.log("✅ Sample deleted successfully, refreshing data...");
+      console.log("🔄 Refetching samples after delete...");
       fetchData();
     } catch (err) {
-      console.error("❌ Error deleting sample:", err.response?.data || err);
+      console.error("❌ Error deleting sample:", err);
     }
   };
 
@@ -79,7 +89,6 @@ export default function SamplesList() {
           <h3 className="text-lg font-semibold text-gray-900">Samples Overview</h3>
           <button
             onClick={() => {
-              console.log("📂 Opening drawer for new sample");
               setEditingSample(null);
               setIsDrawerOpen(true);
             }}
@@ -155,7 +164,6 @@ export default function SamplesList() {
       <SampleDrawer
         isOpen={isDrawerOpen}
         onClose={() => {
-          console.log("📂 Closing drawer");
           setIsDrawerOpen(false);
           setEditingSample(null);
         }}
