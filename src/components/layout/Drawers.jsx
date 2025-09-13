@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState,useEffect } from "react";
 import axios from "../../services/api/axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,18 +12,21 @@ import { X } from "lucide-react";
 
 // ---------------- DRAWER WRAPPER ----------------
 const DrawerWrapper = ({ title, children, onClose, isOpen }) => {
-  if (!isOpen) return null; // <-- only render when open
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex justify-end z-50">
-      <div className="w-full max-w-lg bg-white h-full shadow-xl flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">{title}</h2>
-          <button onClick={onClose} className="text-gray-600 hover:text-gray-900">
-            ✕
+    <div className="fixed inset-0 z-50 flex justify-end">
+      {/* Drawer */}
+      <div className="relative w-full max-w-md bg-white h-full shadow-xl overflow-y-auto flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto p-4">{children}</div>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6">{children}</div>
       </div>
     </div>
   );
@@ -31,7 +34,7 @@ const DrawerWrapper = ({ title, children, onClose, isOpen }) => {
 
 // ---------------- CREATE PATIENT ----------------
 export const CreatePatient = ({ isOpen, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     name: "",
     dob: "",
     gender: "MALE",
@@ -39,21 +42,27 @@ export const CreatePatient = ({ isOpen, onClose, onSubmit }) => {
     email: "",
     address: "",
     emergencyContact: "",
+    medicalRecordNumber: "",
+    isActive: true,
   });
   const [loading, setLoading] = useState(false);
   const { auth } = useAuth();
   const navigate = useNavigate();
 
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Send the exact structure backend expects
-      await axios.post(PATIENTS_URL, formData, {
+      await axios.post(PATIENTS_URL, form, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         withCredentials: true,
       });
-      onSubmit?.(formData);
+      onSubmit?.(form);
       navigate("/patients");
       onClose();
     } catch (err) {
@@ -66,69 +75,28 @@ export const CreatePatient = ({ isOpen, onClose, onSubmit }) => {
 
   return (
     <DrawerWrapper title="Create Patient" onClose={onClose} isOpen={isOpen}>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full border rounded p-2"
-          required
-        />
-        <input
-          type="date"
-          placeholder="Date of Birth"
-          value={formData.dob}
-          onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-          className="w-full border rounded p-2"
-          required
-        />
-        <select
-          value={formData.gender}
-          onChange={(e) => setFormData({ ...formData, gender: e.target.value.toUpperCase() })}
-          className="w-full border rounded p-2"
-          required
-        >
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="Full Name" required className="w-full border rounded p-2" />
+        <input type="date" name="dob" value={form.dob} onChange={handleChange} placeholder="Date of Birth" required className="w-full border rounded p-2" />
+        <select name="gender" value={form.gender} onChange={handleChange} className="w-full border rounded p-2" required>
           <option value="MALE">Male</option>
           <option value="FEMALE">Female</option>
+          <option value="OTHER">Other</option>
+          <option value="UNKNOWN">Unknown</option>
         </select>
-        <input
-          type="tel"
-          placeholder="Phone"
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          className="w-full border rounded p-2"
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full border rounded p-2"
-          required
-        />
-        <input
-          type="text"
-          placeholder="Address"
-          value={formData.address}
-          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-          className="w-full border rounded p-2"
-        />
-        <input
-          type="text"
-          placeholder="Emergency Contact"
-          value={formData.emergencyContact}
-          onChange={(e) => setFormData({ ...formData, emergencyContact: e.target.value })}
-          className="w-full border rounded p-2"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white rounded p-2"
-        >
-          {loading ? "Saving..." : "Save Patient"}
-        </button>
+        <input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="Phone" required className="w-full border rounded p-2" />
+        <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="Email" required className="w-full border rounded p-2" />
+        <input type="text" name="address" value={form.address} onChange={handleChange} placeholder="Address" className="w-full border rounded p-2" />
+        <input type="text" name="emergencyContact" value={form.emergencyContact} onChange={handleChange} placeholder="Emergency Contact" className="w-full border rounded p-2" />
+        <input type="text" name="medicalRecordNumber" value={form.medicalRecordNumber} onChange={handleChange} placeholder="Medical Record Number" className="w-full border rounded p-2" />
+        <div className="flex items-center space-x-2 mt-2">
+          <input type="checkbox" name="isActive" checked={form.isActive} onChange={handleChange} className="w-4 h-4" />
+          <label className="text-sm font-medium text-gray-700">Active</label>
+        </div>
+        <div className="flex justify-end space-x-2 mt-4">
+          <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Cancel</button>
+          <button type="submit" disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">{loading ? "Saving..." : "Save Patient"}</button>
+        </div>
       </form>
     </DrawerWrapper>
   );
@@ -136,19 +104,21 @@ export const CreatePatient = ({ isOpen, onClose, onSubmit }) => {
 
 // ---------------- CREATE TEST REQUEST ----------------
 export const CreateTestRequest = ({ isOpen, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({ patientId: "", testType: "", notes: "" });
+  const [form, setForm] = useState({ patientId: "", testType: "", notes: "" });
   const [loading, setLoading] = useState(false);
   const { auth } = useAuth();
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(TEST_REQUESTS_URL, formData, {
+      await axios.post(TEST_REQUESTS_URL, form, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         withCredentials: true,
       });
-      onSubmit?.(formData);
+      onSubmit?.(form);
       onClose();
     } catch (err) {
       console.error("Error creating test request:", err);
@@ -160,36 +130,14 @@ export const CreateTestRequest = ({ isOpen, onClose, onSubmit }) => {
 
   return (
     <DrawerWrapper title="Create Test Request" onClose={onClose} isOpen={isOpen}>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Patient ID"
-          value={formData.patientId}
-          onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
-          className="w-full border rounded p-2"
-          required
-        />
-        <input
-          type="text"
-          placeholder="Test Type"
-          value={formData.testType}
-          onChange={(e) => setFormData({ ...formData, testType: e.target.value })}
-          className="w-full border rounded p-2"
-          required
-        />
-        <textarea
-          placeholder="Notes"
-          value={formData.notes}
-          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-          className="w-full border rounded p-2"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-green-600 text-white rounded p-2"
-        >
-          {loading ? "Saving..." : "Save Request"}
-        </button>
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <input type="text" name="patientId" value={form.patientId} onChange={handleChange} placeholder="Patient ID" required className="w-full border rounded p-2" />
+        <input type="text" name="testType" value={form.testType} onChange={handleChange} placeholder="Test Type" required className="w-full border rounded p-2" />
+        <textarea name="notes" value={form.notes} onChange={handleChange} placeholder="Notes" className="w-full border rounded p-2" />
+        <div className="flex justify-end space-x-2 mt-4">
+          <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Cancel</button>
+          <button type="submit" disabled={loading} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">{loading ? "Saving..." : "Save Request"}</button>
+        </div>
       </form>
     </DrawerWrapper>
   );
@@ -197,19 +145,21 @@ export const CreateTestRequest = ({ isOpen, onClose, onSubmit }) => {
 
 // ---------------- CREATE SAMPLE ----------------
 export const CreateSample = ({ isOpen, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({ testRequestId: "", sampleType: "", collectedBy: "" });
+  const [form, setForm] = useState({ testRequestId: "", sampleType: "", collectedBy: "" });
   const [loading, setLoading] = useState(false);
   const { auth } = useAuth();
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(SAMPLES_URL, formData, {
+      await axios.post(SAMPLES_URL, form, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         withCredentials: true,
       });
-      onSubmit?.(formData);
+      onSubmit?.(form);
       onClose();
     } catch (err) {
       console.error("Error creating sample:", err);
@@ -221,37 +171,14 @@ export const CreateSample = ({ isOpen, onClose, onSubmit }) => {
 
   return (
     <DrawerWrapper title="Create Sample" onClose={onClose} isOpen={isOpen}>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Test Request ID"
-          value={formData.testRequestId}
-          onChange={(e) => setFormData({ ...formData, testRequestId: e.target.value })}
-          className="w-full border rounded p-2"
-          required
-        />
-        <input
-          type="text"
-          placeholder="Sample Type"
-          value={formData.sampleType}
-          onChange={(e) => setFormData({ ...formData, sampleType: e.target.value })}
-          className="w-full border rounded p-2"
-          required
-        />
-        <input
-          type="text"
-          placeholder="Collected By"
-          value={formData.collectedBy}
-          onChange={(e) => setFormData({ ...formData, collectedBy: e.target.value })}
-          className="w-full border rounded p-2"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-purple-600 text-white rounded p-2"
-        >
-          {loading ? "Saving..." : "Save Sample"}
-        </button>
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <input type="text" name="testRequestId" value={form.testRequestId} onChange={handleChange} placeholder="Test Request ID" required className="w-full border rounded p-2" />
+        <input type="text" name="sampleType" value={form.sampleType} onChange={handleChange} placeholder="Sample Type" required className="w-full border rounded p-2" />
+        <input type="text" name="collectedBy" value={form.collectedBy} onChange={handleChange} placeholder="Collected By" className="w-full border rounded p-2" />
+        <div className="flex justify-end space-x-2 mt-4">
+          <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Cancel</button>
+          <button type="submit" disabled={loading} className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">{loading ? "Saving..." : "Save Sample"}</button>
+        </div>
       </form>
     </DrawerWrapper>
   );
@@ -259,19 +186,21 @@ export const CreateSample = ({ isOpen, onClose, onSubmit }) => {
 
 // ---------------- CREATE LAB RESULT ----------------
 export const CreateLabResult = ({ isOpen, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({ sampleId: "", result: "", remarks: "" });
+  const [form, setForm] = useState({ sampleId: "", result: "", remarks: "" });
   const [loading, setLoading] = useState(false);
   const { auth } = useAuth();
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(LAB_RESULTS_URL, formData, {
+      await axios.post(LAB_RESULTS_URL, form, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         withCredentials: true,
       });
-      onSubmit?.(formData);
+      onSubmit?.(form);
       onClose();
     } catch (err) {
       console.error("Error creating lab result:", err);
@@ -283,39 +212,19 @@ export const CreateLabResult = ({ isOpen, onClose, onSubmit }) => {
 
   return (
     <DrawerWrapper title="Create Lab Result" onClose={onClose} isOpen={isOpen}>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Sample ID"
-          value={formData.sampleId}
-          onChange={(e) => setFormData({ ...formData, sampleId: e.target.value })}
-          className="w-full border rounded p-2"
-          required
-        />
-        <textarea
-          placeholder="Result"
-          value={formData.result}
-          onChange={(e) => setFormData({ ...formData, result: e.target.value })}
-          className="w-full border rounded p-2"
-          required
-        />
-        <textarea
-          placeholder="Remarks"
-          value={formData.remarks}
-          onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
-          className="w-full border rounded p-2"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-red-600 text-white rounded p-2"
-        >
-          {loading ? "Saving..." : "Save Result"}
-        </button>
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <input type="text" name="sampleId" value={form.sampleId} onChange={handleChange} placeholder="Sample ID" required className="w-full border rounded p-2" />
+        <textarea name="result" value={form.result} onChange={handleChange} placeholder="Result" required className="w-full border rounded p-2" />
+        <textarea name="remarks" value={form.remarks} onChange={handleChange} placeholder="Remarks" className="w-full border rounded p-2" />
+        <div className="flex justify-end space-x-2 mt-4">
+          <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Cancel</button>
+          <button type="submit" disabled={loading} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">{loading ? "Saving..." : "Save Result"}</button>
+        </div>
       </form>
     </DrawerWrapper>
   );
 };
+
 
 
 //---------------- Edit Drawers -------------------------
