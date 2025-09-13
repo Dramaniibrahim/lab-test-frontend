@@ -322,6 +322,7 @@ export const CreateLabResult = ({ isOpen, onClose, onSubmit }) => {
 
 //---------------- Patients -----------------------------
 
+
 export function EditPatientDrawer({ isOpen, onClose, onSubmit, patientData }) {
   const [form, setForm] = useState({
     name: "",
@@ -332,6 +333,7 @@ export function EditPatientDrawer({ isOpen, onClose, onSubmit, patientData }) {
     address: "",
     emergencyContact: "",
     medicalRecordNumber: "",
+    isActive: true, // default active
   });
 
   useEffect(() => {
@@ -345,18 +347,22 @@ export function EditPatientDrawer({ isOpen, onClose, onSubmit, patientData }) {
         address: patientData.address || "",
         emergencyContact: patientData.emergencyContact || "",
         medicalRecordNumber: patientData.medicalRecordNumber || "",
+        isActive: patientData.isActive ?? true, // default true if undefined
       });
     }
   }, [patientData]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form); // Pass form data back to parent
+    onSubmit(form); // Pass all form data including isActive
   };
 
   if (!isOpen) return null;
@@ -364,10 +370,7 @@ export function EditPatientDrawer({ isOpen, onClose, onSubmit, patientData }) {
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       {/* Overlay */}
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50"
-        onClick={onClose}
-      ></div>
+      <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
 
       {/* Drawer */}
       <div className="relative w-full max-w-md bg-white h-full shadow-xl overflow-y-auto">
@@ -381,6 +384,7 @@ export function EditPatientDrawer({ isOpen, onClose, onSubmit, patientData }) {
 
         {/* Form */}
         <form className="p-6 space-y-4" onSubmit={handleSubmit}>
+          {/* Existing fields */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Name</label>
             <input
@@ -475,6 +479,18 @@ export function EditPatientDrawer({ isOpen, onClose, onSubmit, patientData }) {
             />
           </div>
 
+          {/* isActive toggle */}
+          <div className="flex items-center space-x-2 mt-2">
+            <input
+              type="checkbox"
+              name="isActive"
+              checked={form.isActive}
+              onChange={handleChange}
+              className="w-4 h-4"
+            />
+            <label className="text-sm font-medium text-gray-700">Active</label>
+          </div>
+
           {/* Buttons */}
           <div className="flex justify-end space-x-2 mt-4">
             <button
@@ -496,3 +512,4 @@ export function EditPatientDrawer({ isOpen, onClose, onSubmit, patientData }) {
     </div>
   );
 }
+
