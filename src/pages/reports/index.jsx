@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   BarChart,
   Bar,
@@ -13,25 +13,25 @@ import {
   ChevronDown,
   MoreHorizontal,
   Filter,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
-import { usePatientsData } from "../../services/api/route-data";
-import { useTestRequestsData } from "../../services/api/route-data";
-import { useSamplesData } from "../../services/api/route-data";
-import { useLabResultsData } from "../../services/api/route-data";
+import {
+  usePatientsData,
+  useTestRequestsData,
+  useSamplesData,
+  useLabResultsData,
+} from "../../services/api/route-data";
 
 export default function Reports() {
   const [selectedDate, setSelectedDate] = useState("September 2025");
   const [activeTab, setActiveTab] = useState("Week");
 
-  // Fetch data from hooks
-  const { patients } = usePatientsData();
-  const { testRequests } = useTestRequestsData();
-  const { samples } = useSamplesData();
-  const { testResults } = useLabResultsData();
+  // ✅ Default to [] so .length doesn't throw
+  const { patients = [] } = usePatientsData();
+  const { testRequests = [] } = useTestRequestsData();
+  const { samples = [] } = useSamplesData();
+  const { testResults = [] } = useLabResultsData();
 
-  // Generate chart data (patients + testResults per weekday)
+  // Generate chart data (placeholder distribution)
   const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const chartData = weekdays.map((day, i) => ({
     name: day,
