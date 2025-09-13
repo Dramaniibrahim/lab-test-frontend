@@ -33,18 +33,19 @@ export function usePatientsData() {
         },
         withCredentials: true,
       });
-      setPatients(response.data);
+      setPatients(response.data.data || []); // <-- Fix here
     } catch (err) {
       console.error(err);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    if (auth?.token) fetchData();
   }, [auth]);
 
   return { patients, fetchData };
 }
+
 
 export function usePatientByIdData(id) {
   const { auth } = useContext(useAuthContext);
