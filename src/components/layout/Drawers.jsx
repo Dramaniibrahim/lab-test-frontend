@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "../../services/api/axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -7,39 +7,29 @@ import {
   SAMPLES_URL,
   LAB_RESULTS_URL,
 } from "../../services/api/routes";
+
 import { useAuth } from "../../context/AuthContext";
 
-// ---------------- DRAWER WRAPPER ----------------
-const DrawerWrapper = ({ title, children, onClose, isOpen }) => {
-  if (!isOpen) return null; // prevents always rendering
-
-  return (
-    <div className="fixed inset-0 flex justify-end z-50">
-      {/* Overlay behind the drawer */}
-      <div
-        className="absolute inset-0 bg-black bg-opacity-40"
-        onClick={onClose}
-      ></div>
-
-      {/* Drawer panel */}
-      <div className="relative w-full max-w-lg bg-white h-full shadow-xl flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">{title}</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-600 hover:text-gray-900"
-          >
-            ✕
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto p-4">{children}</div>
+const DrawerWrapper = ({ title, children, onClose }) => (
+  <div className="fixed inset-0 flex justify-end z-50">
+    <div className="w-full max-w-lg bg-white h-full shadow-xl flex flex-col">
+      <div className="flex items-center justify-between p-4 border-b">
+        <h2 className="text-lg font-semibold">{title}</h2>
+        <button onClick={onClose} className="text-gray-600 hover:text-gray-900">
+          ✕
+        </button>
       </div>
+      <div className="flex-1 overflow-y-auto p-4">{children}</div>
     </div>
-  );
-};
+    <div
+      className="fixed inset-0 bg-black bg-opacity-40"
+      onClick={onClose}
+    ></div>
+  </div>
+);
 
 // ---------------- CREATE PATIENT ----------------
-export const CreatePatient = ({ isOpen, onClose, onSubmit }) => {
+export const CreatePatient = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     name: "",
     gender: "male",
@@ -73,7 +63,7 @@ export const CreatePatient = ({ isOpen, onClose, onSubmit }) => {
   };
 
   return (
-    <DrawerWrapper title="Create Patient" onClose={onClose} isOpen={isOpen}>
+    <DrawerWrapper title="Create Patient" onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
@@ -121,7 +111,7 @@ export const CreatePatient = ({ isOpen, onClose, onSubmit }) => {
 };
 
 // ---------------- CREATE TEST REQUEST ----------------
-export const CreateTestRequest = ({ isOpen, onClose, onSubmit }) => {
+export const CreateTestRequest = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     patientId: "",
     testType: "",
@@ -152,7 +142,7 @@ export const CreateTestRequest = ({ isOpen, onClose, onSubmit }) => {
   };
 
   return (
-    <DrawerWrapper title="Create Test Request" onClose={onClose} isOpen={isOpen}>
+    <DrawerWrapper title="Create Test Request" onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
@@ -193,7 +183,7 @@ export const CreateTestRequest = ({ isOpen, onClose, onSubmit }) => {
 };
 
 // ---------------- CREATE SAMPLE ----------------
-export const CreateSample = ({ isOpen, onClose, onSubmit }) => {
+export const CreateSample = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     testRequestId: "",
     sampleType: "",
@@ -224,7 +214,7 @@ export const CreateSample = ({ isOpen, onClose, onSubmit }) => {
   };
 
   return (
-    <DrawerWrapper title="Create Sample" onClose={onClose} isOpen={isOpen}>
+    <DrawerWrapper title="Create Sample" onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
@@ -268,7 +258,7 @@ export const CreateSample = ({ isOpen, onClose, onSubmit }) => {
 };
 
 // ---------------- CREATE LAB RESULT ----------------
-export const CreateLabResult = ({ isOpen, onClose, onSubmit }) => {
+export const CreateLabResult = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     sampleId: "",
     result: "",
@@ -299,7 +289,7 @@ export const CreateLabResult = ({ isOpen, onClose, onSubmit }) => {
   };
 
   return (
-    <DrawerWrapper title="Create Lab Result" onClose={onClose} isOpen={isOpen}>
+    <DrawerWrapper title="Create Lab Result" onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
