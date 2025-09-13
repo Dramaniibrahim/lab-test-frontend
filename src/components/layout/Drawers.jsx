@@ -32,9 +32,12 @@ const DrawerWrapper = ({ title, children, onClose, isOpen }) => {
 export const CreatePatient = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     name: "",
-    gender: "male",
-    age: "",
-    contact: "",
+    dob: "",
+    gender: "MALE",
+    phone: "",
+    email: "",
+    address: "",
+    emergencyContact: "",
   });
   const [loading, setLoading] = useState(false);
   const { auth } = useAuth();
@@ -44,6 +47,7 @@ export const CreatePatient = ({ isOpen, onClose, onSubmit }) => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Send the exact structure backend expects
       await axios.post(PATIENTS_URL, formData, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         withCredentials: true,
@@ -52,8 +56,8 @@ export const CreatePatient = ({ isOpen, onClose, onSubmit }) => {
       navigate("/patients");
       onClose();
     } catch (err) {
-      console.error("Error creating patient:", err);
-      alert("Failed to create patient");
+      console.error("Error creating patient:", err.response?.data || err);
+      alert(err.response?.data?.error?.message || "Failed to create patient");
     } finally {
       setLoading(false);
     }
@@ -70,27 +74,51 @@ export const CreatePatient = ({ isOpen, onClose, onSubmit }) => {
           className="w-full border rounded p-2"
           required
         />
+        <input
+          type="date"
+          placeholder="Date of Birth"
+          value={formData.dob}
+          onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
+          className="w-full border rounded p-2"
+          required
+        />
         <select
           value={formData.gender}
-          onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, gender: e.target.value.toUpperCase() })}
           className="w-full border rounded p-2"
+          required
         >
-          <option value="male">Male</option>
-          <option value="female">Female</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
         </select>
         <input
-          type="number"
-          placeholder="Age"
-          value={formData.age}
-          onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+          type="tel"
+          placeholder="Phone"
+          value={formData.phone}
+          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          className="w-full border rounded p-2"
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className="w-full border rounded p-2"
           required
         />
         <input
           type="text"
-          placeholder="Contact"
-          value={formData.contact}
-          onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
+          placeholder="Address"
+          value={formData.address}
+          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+          className="w-full border rounded p-2"
+        />
+        <input
+          type="text"
+          placeholder="Emergency Contact"
+          value={formData.emergencyContact}
+          onChange={(e) => setFormData({ ...formData, emergencyContact: e.target.value })}
           className="w-full border rounded p-2"
         />
         <button
