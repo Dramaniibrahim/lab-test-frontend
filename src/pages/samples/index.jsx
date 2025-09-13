@@ -1,146 +1,154 @@
-import { useState } from 'react';
-import { Plus, Edit, Trash2 } from 'lucide-react';
-import { SampleDrawer } from '../../components/layout/Drawers';
+import { useState } from "react";
+import { Plus, Edit, Trash2 } from "lucide-react";
+import { SampleDrawer } from "../../components/layout/Drawers";
+import { useSamplesData } from "../../api/data";
+import axios from "../../api/axios";
+import {
+  SAMPLES_URL,
+  SAMPLE_BY_ID_URL,
+} from "../../api/routes";
+import { useAuth } from "../../context/AuthContext";
 
 export default function SamplesList() {
-  const [selectedView, setSelectedView] = useState('Today');
+  const { auth } = useAuth();
+  const { samples, fetchData } = useSamplesData();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [editingSample, setEditingSample] = useState(null);
 
-  const samples = [
-    {
-      id: 's1',
-      testRequestId: 'tr1',
-      barcode: 'ABC123456789',
-      type: 'BLOOD',
-      volume: 5.5,
-      storageLocation: 'Lab Freezer A',
-      expiresAt: '2025-10-01',
-      notes: 'Handle with care',
-    },
-    {
-      id: 's2',
-      testRequestId: 'tr2',
-      barcode: 'XYZ987654321',
-      type: 'URINE',
-      volume: 10.0,
-      storageLocation: 'Lab Shelf B',
-      expiresAt: '2025-09-15',
-      notes: 'Urgent analysis',
-    },
-    {
-      id: 's3',
-      testRequestId: 'tr3',
-      barcode: 'DEF456789123',
-      type: 'SALIVA',
-      volume: 2.0,
-      storageLocation: 'Lab Cooler C',
-      expiresAt: '2025-11-01',
-      notes: 'Check for contamination',
-    },
-    {
-      id: 's4',
-      testRequestId: 'tr4',
-      barcode: 'GHI789123456',
-      type: 'TISSUE',
-      volume: null,
-      storageLocation: 'Lab Freezer D',
-      expiresAt: null,
-      notes: 'Biopsy sample',
-    },
-  ];
+  // Handle create/update form submission
+  const handleFormSubmit = async (formData) => {
+    try {
+      if (editingSample) {
+        // Update sample
+        await axios.put(SAMPLE_BY_ID_URL(editingSample.id), formData, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.token}`,
+          },
+          withCredentials: true,
+        });
+      } else {
+        // Create new sample
+        await axios.post(SAMPLES_URL, formData, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.token}`,
+          },
+          withCredentials: true,
+        });
+      }
+      fetchData();
+      setIsDrawerOpen(false);
+      setEditingSample(null);
+    } catch (err) {
+      console.error("Error saving sample:", err);
+    }
+  };
 
-  const handleFormSubmit = (formData) => {
-    console.log('Sample form submitted:', formData);
-    setIsDrawerOpen(false);
+  // Handle delete
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this sample?")) return;
+    try {
+      await axios.delete(SAMPLE_BY_ID_URL(id), {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.token}`,
+        },
+        withCredentials: true,
+      });
+      fetchData();
+    } catch (err) {
+      console.error("Error deleting sample:", err);
+    }
   };
 
   return (
     <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 relative">
+      {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">Samples Overview</h3>
-          <div className="flex items-center space-x-4">
-            <div className="flex space-x-2">
-              {['Today', 'Weekly', 'Monthly', 'Yearly'].map((period) => (
-                <button
-                  key={period}
-                  onClick={() => setSelectedView(period)}
-                  className={`px-3 py-1 text-sm rounded ${
-                    selectedView === period
-                      ? 'bg-gray-900 text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  {period}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setIsDrawerOpen(true)}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Sample
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              setEditingSample(null);
+              setIsDrawerOpen(true);
+            }}
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create Sample
+          </button>
         </div>
         <p className="text-sm text-gray-500 mt-1">
-          Manage samples for laboratory testing.
+          Manage collected samples linked to test requests.
         </p>
       </div>
 
+      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <input type="checkbox" className="rounded border-gray-300" />
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test Request ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Barcode</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Volume (mL)</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Storage Location</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiration Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+              <th className="px-6 py-3"></th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Test Request ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Barcode</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {samples.map((sample) => (
-              <tr key={sample.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <input type="checkbox" className="rounded border-gray-300" />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sample.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sample.testRequestId}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sample.barcode}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sample.type}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sample.volume || '-'}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sample.storageLocation || '-'}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sample.expiresAt || '-'}</td>
-                <td className="px-6 py-4 text-sm text-gray-900">{sample.notes || '-'}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <div className="flex space-x-2">
-                    <button className="text-blue-600 hover:text-blue-900">
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button className="text-red-600 hover:text-red-900">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+            {samples.length > 0 ? (
+              samples.map((sample) => (
+                <tr key={sample.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <input type="checkbox" className="rounded border-gray-300" />
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{sample.id}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{sample.testRequestId || "-"}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{sample.barcode || "-"}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{sample.type || "-"}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex space-x-2">
+                      <button
+                        className="text-blue-600 hover:text-blue-900"
+                        onClick={() => {
+                          setEditingSample(sample);
+                          setIsDrawerOpen(true);
+                        }}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        className="text-red-600 hover:text-red-900"
+                        onClick={() => handleDelete(sample.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                  No samples found
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
+      {/* Drawer */}
       <SampleDrawer
         isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
+        onClose={() => {
+          setIsDrawerOpen(false);
+          setEditingSample(null);
+        }}
         onSubmit={handleFormSubmit}
+        sampleData={editingSample} // pre-fill if editing
       />
     </div>
   );

@@ -93,6 +93,10 @@ export default function Sidebar() {
                 Others
               </div>
               <div className="space-y-1 mt-2">
+                <div className="flex items-center space-x-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
+                  <Users className="w-4 h-4" />
+                  {<li><Link to="/reports">Report</Link></li>}
+                </div>
                 {/*<div className="flex items-center space-x-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
                   <div className="w-4 h-4 bg-gray-400 rounded"></div>
                   <span>Payment</span>
