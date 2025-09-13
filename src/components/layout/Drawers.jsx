@@ -322,7 +322,7 @@ export const CreateLabResult = ({ isOpen, onClose, onSubmit }) => {
 
 //---------------- Patients -----------------------------
 
-export default function EditPatientDrawer({ isOpen, onClose, patientData, onSubmit }) {
+export function EditPatientDrawer({ isOpen, onClose, patientData, onSubmit }) {
   const [formData, setFormData] = useState({
     name: "",
     dob: "",
