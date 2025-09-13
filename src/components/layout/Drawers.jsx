@@ -365,7 +365,9 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
         <select name="testRequestId" value={form.testRequestId} onChange={handleChange} required className="w-full border rounded p-2">
           <option value="">Select Test Request</option>
           {testRequests.map((t) => (
-            <option key={t.id} value={t.id}>{t.testType}</option>
+            <option key={t.id} value={t.id}>
+              {typeof t.testType === "object" ? t.testType.name : t.testType}
+            </option>
           ))}
         </select>
 
