@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { CreateSample } from '../../components/layout/Drawers';
+import { SampleDrawer } from '../../components/layout/Drawers';
 
 export default function SamplesList() {
   const [selectedView, setSelectedView] = useState('Today');
@@ -137,7 +137,7 @@ export default function SamplesList() {
         </table>
       </div>
 
-      <CreateSample
+      <SampleDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         onSubmit={handleFormSubmit}

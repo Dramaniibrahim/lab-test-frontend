@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { CreateTestRequest } from '../../components/layout/Drawers';
+import { TestRequestDrawer } from '../../components/layout/Drawers';
 
 export default function TestRequestsList() {
   const [selectedView, setSelectedView] = useState('Today');
@@ -145,7 +145,7 @@ export default function TestRequestsList() {
         </table>
       </div>
 
-      <CreateTestRequest
+      <TestRequestDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         onSubmit={handleFormSubmit}

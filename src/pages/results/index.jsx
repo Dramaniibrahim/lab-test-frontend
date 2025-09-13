@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { CreateLabResult } from '../../components/layout/Drawers';
+import { LabResultDrawer } from '../../components/layout/Drawers';
 
 export default function ResultsList() {
   const [selectedView, setSelectedView] = useState('Today');
@@ -125,7 +125,7 @@ export default function ResultsList() {
         </table>
       </div>
 
-      <CreateLabResult
+      <LabResultDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         onSubmit={handleFormSubmit}
