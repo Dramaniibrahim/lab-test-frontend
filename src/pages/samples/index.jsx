@@ -18,8 +18,8 @@ export default function SamplesList() {
   // Normalize API response
   const samples = Array.isArray(rawSamples)
     ? rawSamples
-    : rawSamples?.data && Array.isArray(rawSamples.data)
-    ? rawSamples.data
+    : rawSamples?.data?.samples && Array.isArray(rawSamples.data.samples)
+    ? rawSamples.data.samples
     : [];
 
   console.log("✅ Normalized samples array:", samples);
