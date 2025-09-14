@@ -424,7 +424,11 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: name === "volume" ? (value === "" ? "" : parseFloat(value)) : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -501,7 +505,7 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
           className="w-full border rounded p-2"
         />
 
-        {/* Sample Type Dropdown (renamed to 'type') */}
+        {/* Sample Type Dropdown */}
         <select
           name="type"
           value={form.type}
@@ -580,6 +584,7 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
     </DrawerWrapper>
   );
 };
+
 
 
 
