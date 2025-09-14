@@ -367,9 +367,8 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
   const [form, setForm] = useState({
     testRequestId: "",
     barcode: "",
-    sampleType: "",
+    type: "",
     volume: "",
-    collectedBy: "",
     storageLocation: "",
     expiresAt: "",
     notes: "",
@@ -378,7 +377,7 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
   const [testRequests, setTestRequests] = useState([]);
   const { auth } = useAuth();
 
-  // Fetch test requests
+  // Fetch test requests for dropdown
   useEffect(() => {
     const fetchRequests = async () => {
       try {
@@ -394,15 +393,14 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
     if (auth?.token) fetchRequests();
   }, [auth]);
 
-  // Populate form on edit / reset on create
+  // Populate form when editing / reset when creating
   useEffect(() => {
     if (sampleData) {
       setForm({
         testRequestId: sampleData.testRequestId || "",
         barcode: sampleData.barcode || "",
-        sampleType: sampleData.sampleType || "",
+        type: sampleData.type || "",
         volume: sampleData.volume || "",
-        collectedBy: sampleData.collectedBy || "",
         storageLocation: sampleData.storageLocation || "",
         expiresAt: sampleData.expiresAt ? sampleData.expiresAt.split("T")[0] : "",
         notes: sampleData.notes || "",
@@ -411,9 +409,8 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
       setForm({
         testRequestId: "",
         barcode: "",
-        sampleType: "",
+        type: "",
         volume: "",
-        collectedBy: "",
         storageLocation: "",
         expiresAt: "",
         notes: "",
@@ -490,15 +487,16 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
           name="barcode"
           value={form.barcode}
           onChange={handleChange}
-          placeholder="Barcode"
+          placeholder="Barcode (12 alphanumeric characters)"
           required
+          maxLength={12}
           className="w-full border rounded p-2"
         />
 
-        {/* Sample Type Dropdown */}
+        {/* Sample Type Dropdown (renamed to 'type') */}
         <select
-          name="sampleType"
-          value={form.sampleType}
+          name="type"
+          value={form.type}
           onChange={handleChange}
           required
           className="w-full border rounded p-2"
@@ -513,21 +511,13 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
 
         {/* Volume */}
         <input
-          type="text"
+          type="number"
           name="volume"
           value={form.volume}
           onChange={handleChange}
-          placeholder="Volume"
-          className="w-full border rounded p-2"
-        />
-
-        {/* Collected By */}
-        <input
-          type="text"
-          name="collectedBy"
-          value={form.collectedBy}
-          onChange={handleChange}
-          placeholder="Collected By"
+          placeholder="Volume (e.g. 5.0)"
+          min="0"
+          step="0.01"
           className="w-full border rounded p-2"
         />
 
@@ -538,6 +528,7 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
           value={form.storageLocation}
           onChange={handleChange}
           placeholder="Storage Location"
+          maxLength={100}
           className="w-full border rounded p-2"
         />
 
@@ -556,10 +547,11 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
           value={form.notes}
           onChange={handleChange}
           placeholder="Notes"
+          maxLength={1000}
           className="w-full border rounded p-2"
         />
 
-        {/* Buttons */}
+        {/* Action Buttons */}
         <div className="flex justify-end space-x-2 mt-4">
           <button
             type="button"
