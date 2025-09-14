@@ -144,7 +144,6 @@ export const PatientDrawer = ({ isOpen, onClose, patientData, onSubmit }) => {
 };
 
 // ---------------- TEST REQUEST DRAWER ----------------
-// ---------------- TEST REQUEST DRAWER ----------------
 export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }) => {
   const isEditMode = !!testRequestData;
   const [form, setForm] = useState({
@@ -351,6 +350,18 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
 
 
 // ---------------- SAMPLE DRAWER ----------------
+
+// Sample type options
+const SAMPLE_TYPES = {
+  BLOOD: "BLOOD",
+  URINE: "URINE",
+  STOOL: "STOOL",
+  SALIVA: "SALIVA",
+  TISSUE: "TISSUE",
+  SWAB: "SWAB",
+  OTHER: "OTHER",
+} 
+
 export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
   const isEditMode = !!sampleData;
   const [form, setForm] = useState({
@@ -383,6 +394,7 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
     if (auth?.token) fetchRequests();
   }, [auth]);
 
+  // Populate form on edit / reset on create
   useEffect(() => {
     if (sampleData) {
       setForm({
@@ -419,19 +431,26 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
     setLoading(true);
     try {
       const payload = { ...form };
-      console.log("Submitting Sample:", payload); // ✅ debug log
+      console.log("Submitting Sample:", payload);
 
       if (isEditMode) {
         await axios.put(`${SAMPLES_URL}/${sampleData.id}`, payload, {
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.token}`,
+          },
           withCredentials: true,
         });
       } else {
         await axios.post(SAMPLES_URL, payload, {
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.token}`,
+          },
           withCredentials: true,
         });
       }
+
       onSubmit?.(payload);
       onClose();
     } catch (err) {
@@ -442,11 +461,21 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
     }
   };
 
-
   return (
-    <DrawerWrapper title={isEditMode ? "Edit Sample" : "Create Sample"} onClose={onClose} isOpen={isOpen}>
+    <DrawerWrapper
+      title={isEditMode ? "Edit Sample" : "Create Sample"}
+      onClose={onClose}
+      isOpen={isOpen}
+    >
       <form className="space-y-4" onSubmit={handleSubmit}>
-        <select name="testRequestId" value={form.testRequestId} onChange={handleChange} required className="w-full border rounded p-2">
+        {/* Test Request Dropdown */}
+        <select
+          name="testRequestId"
+          value={form.testRequestId}
+          onChange={handleChange}
+          required
+          className="w-full border rounded p-2"
+        >
           <option value="">Select Test Request</option>
           {testRequests.map((t) => (
             <option key={t.id} value={t.id}>
@@ -455,17 +484,95 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
           ))}
         </select>
 
-        <input type="text" name="barcode" value={form.barcode} onChange={handleChange} placeholder="Barcode" required className="w-full border rounded p-2" />
-        <input type="text" name="sampleType" value={form.sampleType} onChange={handleChange} placeholder="Sample Type" required className="w-full border rounded p-2" />
-        <input type="text" name="volume" value={form.volume} onChange={handleChange} placeholder="Volume" className="w-full border rounded p-2" />
-        <input type="text" name="collectedBy" value={form.collectedBy} onChange={handleChange} placeholder="Collected By" className="w-full border rounded p-2" />
-        <input type="text" name="storageLocation" value={form.storageLocation} onChange={handleChange} placeholder="Storage Location" className="w-full border rounded p-2" />
-        <input type="date" name="expiresAt" value={form.expiresAt} onChange={handleChange} className="w-full border rounded p-2" />
-        <textarea name="notes" value={form.notes} onChange={handleChange} placeholder="Notes" className="w-full border rounded p-2" />
+        {/* Barcode */}
+        <input
+          type="text"
+          name="barcode"
+          value={form.barcode}
+          onChange={handleChange}
+          placeholder="Barcode"
+          required
+          className="w-full border rounded p-2"
+        />
 
+        {/* Sample Type Dropdown */}
+        <select
+          name="sampleType"
+          value={form.sampleType}
+          onChange={handleChange}
+          required
+          className="w-full border rounded p-2"
+        >
+          <option value="">Select Sample Type</option>
+          {Object.entries(SAMPLE_TYPES).map(([key, label]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </select>
+
+        {/* Volume */}
+        <input
+          type="text"
+          name="volume"
+          value={form.volume}
+          onChange={handleChange}
+          placeholder="Volume"
+          className="w-full border rounded p-2"
+        />
+
+        {/* Collected By */}
+        <input
+          type="text"
+          name="collectedBy"
+          value={form.collectedBy}
+          onChange={handleChange}
+          placeholder="Collected By"
+          className="w-full border rounded p-2"
+        />
+
+        {/* Storage Location */}
+        <input
+          type="text"
+          name="storageLocation"
+          value={form.storageLocation}
+          onChange={handleChange}
+          placeholder="Storage Location"
+          className="w-full border rounded p-2"
+        />
+
+        {/* Expires At */}
+        <input
+          type="date"
+          name="expiresAt"
+          value={form.expiresAt}
+          onChange={handleChange}
+          className="w-full border rounded p-2"
+        />
+
+        {/* Notes */}
+        <textarea
+          name="notes"
+          value={form.notes}
+          onChange={handleChange}
+          placeholder="Notes"
+          className="w-full border rounded p-2"
+        />
+
+        {/* Buttons */}
         <div className="flex justify-end space-x-2 mt-4">
-          <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Cancel</button>
-          <button type="submit" disabled={loading} className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+          >
             {loading ? "Saving..." : isEditMode ? "Save Changes" : "Save Sample"}
           </button>
         </div>
@@ -473,6 +580,7 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
     </DrawerWrapper>
   );
 };
+
 
 // ---------------- LAB RESULT DRAWER ----------------
 export const LabResultDrawer = ({ isOpen, onClose, labResultData, onSubmit }) => {
