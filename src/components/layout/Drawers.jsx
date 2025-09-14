@@ -381,13 +381,15 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
+        console.log("🔄 Fetching test requests...");
         const res = await axios.get(TEST_REQUESTS_URL, {
           headers: { Authorization: `Bearer ${auth.token}` },
           withCredentials: true,
         });
+        console.log("✅ Test requests fetched:", res.data?.data?.testRequests);
         setTestRequests(res.data?.data?.testRequests || []);
       } catch (err) {
-        console.error("Error fetching test requests:", err);
+        console.error("❌ Error fetching test requests:", err);
       }
     };
     if (auth?.token) fetchRequests();
@@ -396,6 +398,7 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
   // Populate form when editing / reset when creating
   useEffect(() => {
     if (sampleData) {
+      console.log("✏️ Populating form with sampleData:", sampleData);
       setForm({
         testRequestId: sampleData.testRequestId || "",
         barcode: sampleData.barcode || "",
@@ -406,6 +409,7 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
         notes: sampleData.notes || "",
       });
     } else {
+      console.log("🆕 Resetting form for new sample");
       setForm({
         testRequestId: "",
         barcode: "",
@@ -420,6 +424,7 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(`✍️ Field changed: ${name} =`, value);
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -428,9 +433,10 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
     setLoading(true);
     try {
       const payload = { ...form };
-      console.log("Submitting Sample:", payload);
+      console.log("📤 Submitting Sample payload:", payload);
 
       if (isEditMode) {
+        console.log(`🔧 Updating sample with ID: ${sampleData.id}`);
         await axios.put(`${SAMPLES_URL}/${sampleData.id}`, payload, {
           headers: {
             "Content-Type": "application/json",
@@ -438,7 +444,9 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
           },
           withCredentials: true,
         });
+        console.log("✅ Sample updated successfully");
       } else {
+        console.log("➕ Creating new sample...");
         await axios.post(SAMPLES_URL, payload, {
           headers: {
             "Content-Type": "application/json",
@@ -446,12 +454,13 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
           },
           withCredentials: true,
         });
+        console.log("✅ Sample created successfully");
       }
 
       onSubmit?.(payload);
       onClose();
     } catch (err) {
-      console.error("Error saving sample:", err);
+      console.error("❌ Error saving sample:", err.response?.data || err);
       alert("Failed to save sample");
     } finally {
       setLoading(false);
@@ -572,6 +581,7 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
     </DrawerWrapper>
   );
 };
+
 
 
 // ---------------- LAB RESULT DRAWER ----------------
