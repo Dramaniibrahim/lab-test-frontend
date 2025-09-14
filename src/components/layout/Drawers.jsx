@@ -144,7 +144,6 @@ export const PatientDrawer = ({ isOpen, onClose, patientData, onSubmit }) => {
 };
 
 // ---------------- TEST REQUEST DRAWER ----------------
-// ---------------- TEST REQUEST DRAWER ----------------
 export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }) => {
   const isEditMode = !!testRequestData;
   const [form, setForm] = useState({
@@ -197,7 +196,7 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
     if (testRequestData) {
       setForm({
         patientId: testRequestData.patientId || "",
-        testType: testRequestData.testType || "",
+        testTypeId: testRequestData.testType || "",
         priority: testRequestData.priority || "ROUTINE",
         clinicalInfo: testRequestData.clinicalInfo || "",
         instructions: testRequestData.instructions || "",
@@ -206,7 +205,7 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
     } else {
       setForm({
         patientId: "",
-        testType: "",
+        testTypeId: "",
         priority: "ROUTINE",
         clinicalInfo: "",
         instructions: "",
