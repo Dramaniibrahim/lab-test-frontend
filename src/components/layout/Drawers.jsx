@@ -424,7 +424,6 @@ export const SampleDrawer = ({ isOpen, onClose, sampleData, onSubmit }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(`✍️ Field changed: ${name} =`, value);
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
