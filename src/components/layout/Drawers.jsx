@@ -144,11 +144,12 @@ export const PatientDrawer = ({ isOpen, onClose, patientData, onSubmit }) => {
 };
 
 // ---------------- TEST REQUEST DRAWER ----------------
+// ---------------- TEST REQUEST DRAWER ----------------
 export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }) => {
   const isEditMode = !!testRequestData;
   const [form, setForm] = useState({
     patientId: "",
-    testType: "",
+    testTypeId: "",
     priority: "ROUTINE",
     clinicalInfo: "",
     instructions: "",
@@ -196,7 +197,7 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
     if (testRequestData) {
       setForm({
         patientId: testRequestData.patientId || "",
-        testTypeId: testRequestData.testType || "",
+        testTypeId: testRequestData.testTypeId || "",
         priority: testRequestData.priority || "ROUTINE",
         clinicalInfo: testRequestData.clinicalInfo || "",
         instructions: testRequestData.instructions || "",
@@ -228,12 +229,18 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
 
       if (isEditMode) {
         await axios.put(`${TEST_REQUESTS_URL}/${testRequestData.id}`, payload, {
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.token}`,
+          },
           withCredentials: true,
         });
       } else {
         await axios.post(TEST_REQUESTS_URL, payload, {
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.token}`,
+          },
           withCredentials: true,
         });
       }
@@ -248,7 +255,11 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
   };
 
   return (
-    <DrawerWrapper title={isEditMode ? "Edit Test Request" : "Create Test Request"} onClose={onClose} isOpen={isOpen}>
+    <DrawerWrapper
+      title={isEditMode ? "Edit Test Request" : "Create Test Request"}
+      onClose={onClose}
+      isOpen={isOpen}
+    >
       <form className="space-y-4" onSubmit={handleSubmit}>
         {/* Patient Dropdown */}
         <select
@@ -260,14 +271,16 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
         >
           <option value="">Select Patient</option>
           {patients.map((p) => (
-            <option key={p.id} value={p.id}>{p.name}</option>
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
           ))}
         </select>
 
-        {/* Test Type Dropdown (shows name, sends ID) */}
+        {/* Test Type Dropdown (sends testTypeId) */}
         <select
-          name="testType"
-          value={form.testType}
+          name="testTypeId"
+          value={form.testTypeId}
           onChange={handleChange}
           required
           className="w-full border rounded p-2"
@@ -333,6 +346,7 @@ export const TestRequestDrawer = ({ isOpen, onClose, testRequestData, onSubmit }
     </DrawerWrapper>
   );
 };
+
 
 
 
